@@ -1,1 +1,310 @@
-testing something here 
+package grouponecommandline;
+
+import java.util.*;
+
+public class GroupOneCommandLine
+{
+    public static void main(String[] args)
+    {
+        List VMname = new ArrayList();
+        List VMos = new ArrayList();
+        List VMversion = new ArrayList();
+        List VMsource = new ArrayList();
+        int VMindex = -1;
+      
+        List HubName = new ArrayList();
+        List HubSubnet = new ArrayList();
+        List HubNetmask = new ArrayList();
+        int HubIndex = -1;
+        
+        List HubINF = new ArrayList();
+        
+        List VMconnectsTo1 = new ArrayList();
+        List VMC1eth0 = new ArrayList();
+        
+        List VMconnectsTo2 = new ArrayList();
+        List VMC2eth0 = new ArrayList();
+        
+        List VMconnectsTo3 = new ArrayList();
+        List VMC3eth = new ArrayList();
+      
+        List VMconnectsTo4 = new ArrayList();
+        List VMC4eth = new ArrayList();
+               
+        boolean exitProgram = false;
+        int userChoice;
+        Scanner input = new Scanner(System.in);
+        
+        System.out.print("Welcome to the Group 1 Command Line Project.");
+        
+        while(exitProgram == false)
+        {
+            System.out.print("\n\nPlease select an option from the below list.");
+            System.out.print("\n1 - Add a new VM");
+            System.out.print("\n2 - Add a new Hub");
+            System.out.print("\n3 - View a Device");
+            System.out.print("\n4 - Edit a Device");
+            System.out.print("\n5 - Save the Current Config File");
+            System.out.print("\n6 - Load a Config File");
+            System.out.print("\n7 - Delete Entire Network");
+            System.out.print("\n8 - Exit\n");
+            
+            System.out.print("\nCurrent VMs: ");
+                for(int i = 0; i <= VMname.size() - 1 ; i++ )
+                {
+                    System.out.print(VMname.get(i) + ", ");
+                }
+                    
+                System.out.print("\nCurrent Hubs: ");
+                for(int i = 0; i <= HubName.size() - 1 ; i++ )
+                {
+                    System.out.print(HubName.get(i) + ", ");
+                }
+            System.out.println("\n");
+            userChoice = input.nextInt();
+            
+            switch(userChoice)
+            {
+                default:
+                    System.out.print("Incorrect Response. \n");
+                case 1: AddNewVM(VMname, VMos, VMversion, VMsource, VMindex);
+                   break;
+                case 2: AddNewHub(HubName, HubSubnet, HubNetmask, HubIndex);
+                    break;
+                case 3: ViewDevice(VMname, VMos, VMversion, VMsource, VMindex, HubName, HubSubnet, HubNetmask, HubIndex);
+                    break;
+                case 4: EditDevice(VMname, VMos, VMversion, VMsource, VMindex, HubName, HubSubnet, HubNetmask, HubIndex);
+                    break;
+                case 5: System.out.print("User Chose to Save the Config File.");
+                    break;
+                case 6: System.out.print("User Chose to Load a Config File.");
+                    break;
+                case 7:  System.out.print("User Chose to Delete the Whole Network.");
+                    break;
+                case 8: exitProgram = true;
+                    break;
+            }
+        }
+    }
+    
+    public static void AddNewVM(List VMname, List VMos, List VMversion, List VMsource, int VMindex)
+    {
+        Scanner input = new Scanner(System.in);
+        String usrStringInput;
+               
+        System.out.print("\nPlease enter a unique name for the VM: ");
+        usrStringInput = input.next();
+        while(VMname.contains(usrStringInput) == true)
+        {
+            System.out.print("VM already exists. Please enter a UNIQUE name for the VM: ");
+            usrStringInput = input.next();
+        }
+        VMname.add(usrStringInput);
+        
+        VMindex = VMname.indexOf(usrStringInput);
+        
+        System.out.print("Please enter a OS for the VM: ");
+        usrStringInput = input.next();
+        VMos.add(usrStringInput);
+        
+        System.out.print("Please enter a version for the VM: ");
+        usrStringInput = input.next();
+        VMversion.add(usrStringInput);
+        
+        System.out.print("Please enter a file path for the VM: ");
+        usrStringInput = input.next();
+        VMsource.add(usrStringInput);
+                        
+        System.out.print("Would you like to connect a Hub to this VM?: ");
+        for (int i = 0; i < 4; i++)
+        {
+            usrStringInput = input.next();
+            
+            if (usrStringInput == "y" || usrStringInput == "Y" )
+            {
+                i = 4;
+            }
+            else
+            {
+                i = 4;
+            }
+        }
+        
+        ViewVM(VMname, VMos, VMversion, VMsource, VMindex);
+    }
+    
+    public static void AddNewHub(List HubName, List HubSubnet, List HubNetmask, int HubIndex)
+    {
+        Scanner input = new Scanner(System.in);
+        String usrStringInput;
+        
+        System.out.print("\nPlease enter a unique name for the Hub: ");
+        usrStringInput = input.next();
+        while(HubName.contains(usrStringInput) == true)
+        {
+            System.out.print("VM already exists. Please enter a UNIQUE name for the VM: ");
+            usrStringInput = input.next();
+        }
+        HubName.add(usrStringInput);
+        
+        System.out.print("Please enter a Subnet for Hub: ");
+        usrStringInput = input.next();
+        HubSubnet.add(usrStringInput);
+                        
+        System.out.print("Please enter a NetMask for Hub: ");
+        usrStringInput = input.next();
+        HubNetmask.add(usrStringInput);
+                        
+        ViewHub(HubName, HubSubnet, HubNetmask, HubIndex);
+    }
+
+    public static void ViewDevice(List VMname, List VMos, List VMversion, List VMsource, int VMindex, List HubName, List HubSubnet, List HubNetmask, int HubIndex)
+    {
+        Scanner input = new Scanner(System.in);
+        String usrStringInput;
+        
+        System.out.print("\nWhat is the EXACT name of the device you would like to view?: ");
+        usrStringInput = input.next();
+        
+        if(VMname.contains(usrStringInput))
+        {
+            ViewVM(VMname, VMos, VMversion, VMsource, VMindex);
+        }
+        else if(HubName.contains(usrStringInput))
+        {
+            ViewHub(HubName, HubSubnet, HubNetmask, HubIndex);
+        }
+        else
+        {
+            System.out.print("\nThe device, " + usrStringInput + ", does not exist or has not yet been entered into the program.");
+        }
+    }
+    
+    public static void ViewVM(List VMname, List VMos, List VMversion, List VMsource, int VMindex)
+    {
+        if(VMindex < 0)
+        {
+            System.out.print("\nVM Name: " + VMname.get(VMname.size() - 1));
+            System.out.print("\nVM OS: " + VMos.get(VMos.size() - 1));
+            System.out.print("\nVM Version: " + VMversion.get(VMversion.size() - 1));
+            System.out.print("\nVM Source: " + VMsource.get(VMsource.size() - 1));
+        }
+        else
+        {
+            System.out.print("\nVM Name: " + VMname.get(VMindex));
+            System.out.print("\nVM OS: " + VMos.get(VMindex));
+            System.out.print("\nVM Version: " + VMversion.get(VMindex));
+            System.out.print("\nVM Source: " + VMsource.get(VMindex));
+        }
+    }
+    
+    public static void ViewHub(List HubName, List HubSubnet, List HubNetmask, int HubIndex)
+    {
+        if(HubIndex < 0)
+        {
+            System.out.print("\nHub Name: " + HubName.get(HubName.size() - 1));
+            System.out.print("\nHub Subnet: " + HubSubnet.get(HubSubnet.size() - 1));
+            System.out.print("\nHub Netmask: " + HubNetmask.get(HubNetmask.size() - 1));
+        }
+        else
+        {
+            System.out.print("\nHub Name: " + HubName.get(HubIndex));
+            System.out.print("\nHub Subnet: " + HubSubnet.get(HubIndex));
+            System.out.print("\nHub Netmask: " + HubNetmask.get(HubIndex));
+        }
+    }
+    
+    public static void EditDevice(List VMname, List VMos, List VMversion, List VMsource, int VMindex, List HubName, List HubSubnet, List HubNetmask, int HubIndex)
+    {
+        Scanner input = new Scanner(System.in);
+        String usrStringInput;
+        
+        System.out.print("\nWhat is the EXACT name of the device you would like to edit?: ");
+        usrStringInput = input.next();
+        
+        if(VMname.contains(usrStringInput))
+        {
+            VMindex = VMname.indexOf(usrStringInput);
+            
+            System.out.print("\nPlease enter a unique name for the VM: ");
+            usrStringInput = input.next();
+            while(VMname.contains(usrStringInput) == true)
+            {
+                System.out.print("VM already exists. Please enter a UNIQUE name for the VM: ");
+                usrStringInput = input.next();
+            }
+            VMname.add(VMindex, usrStringInput);
+        
+            System.out.print("Please enter a OS for the VM: ");
+            usrStringInput = input.next();
+            VMos.add(VMindex, usrStringInput);
+        
+            System.out.print("Please enter a version for the VM: ");
+            usrStringInput = input.next();
+            VMversion.add(VMindex, usrStringInput);
+        
+            System.out.print("Please enter a file path for the VM: ");
+            usrStringInput = input.next();
+            VMsource.add(VMindex, usrStringInput);
+                        
+            System.out.print("Would you like to connect a Hub to this VM?: ");
+            for(int i = 0; i < 4; i++)
+            {
+                usrStringInput = input.next();
+            
+                if(usrStringInput == "y" || usrStringInput == "Y" )
+                {
+                    i = 4;
+                }
+                else
+                {
+                    i = 4;
+                }
+            }
+            
+            ViewVM(VMname, VMos, VMversion, VMsource, VMindex);
+        }
+        else if(HubName.contains(usrStringInput))
+        {
+            HubIndex = HubName.indexOf(usrStringInput);
+            
+            System.out.print("\nPlease enter a unique name for the Hub: ");
+            usrStringInput = input.next();
+            while(HubName.contains(usrStringInput) == true)
+            {
+                System.out.print("VM already exists. Please enter a UNIQUE name for the VM: ");
+                usrStringInput = input.next();
+            }
+            HubName.add(VMindex, usrStringInput);
+        
+            System.out.print("Please enter a Subnet for Hub: ");
+            usrStringInput = input.next();
+            HubSubnet.add(VMindex, usrStringInput);
+                        
+            System.out.print("Please enter a NetMask for Hub: ");
+            usrStringInput = input.next();
+            HubNetmask.add(VMindex, usrStringInput);
+                        
+            ViewHub(HubName, HubSubnet, HubNetmask, HubIndex);
+        }
+        else
+        {
+            System.out.print("\nThe device, " + usrStringInput + ", does not exist or has not yet been entered into the program.");
+        }
+    }
+    
+    public static void SaveConfigFile()
+    {
+        
+    }
+    
+    public static void LoadConfigFile()
+    {
+        
+    }
+    
+    public static void DeleteNetwork()
+    {
+        
+    }
+}
