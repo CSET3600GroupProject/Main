@@ -1,0 +1,74 @@
+package grouponecommandline;
+
+public class Hub
+{
+
+	String HubName;
+	String HubSubnet;
+	String HubNetmask;
+
+	String HubINF;
+
+
+	public Hub()
+	{
+		this.HubName = "";
+		this.HubSubnet = "";
+		this.HubNetmask = "";
+		this.HubINF = "";
+	}
+
+
+	public void setHubName(String newHubName)
+	{
+		this.HubName = newHubName;
+	}
+
+	public void setHubSubnet(String newHubSubnet)
+	{
+		this.HubSubnet = newHubSubnet;
+	}
+
+	public void setHubNetmask(String newHubNetmask)
+	{
+		this.HubNetmask = newHubNetmask;
+	}
+
+	public String getHubName()
+	{
+		return HubName;
+	}
+
+	public String getHubSubnet()
+	{
+		return HubSubnet;
+	}
+
+	public String getHubNetmask()
+	{
+		return HubNetmask;
+	}
+
+	public void resetHub()
+	{
+		this.HubName = "";
+		this.HubSubnet = "";
+		this.HubNetmask = "";
+		this. HubINF = "";
+	}
+
+	public void deleteHub()
+	{
+
+	}
+
+	public void selectHub()
+	{
+		getHubName();
+		getHubSubnet();
+		getHubNetmask();
+	}
+
+
+
+}
