@@ -1,0 +1,134 @@
+package grouponecommandline;
+
+public class VM
+{
+    String VMname;
+    String VMos;
+    String VMversion;
+    String VMsource;
+    String VMeth0;
+    String VMeth1;
+    String VMeth2;
+    String VMeth3;
+    
+    public VM()
+    {
+        this.VMname = "";
+        this.VMos = "";
+        this.VMversion = "";
+        this.VMsource = "";
+        this.VMeth0 = "";
+        this.VMeth1 = "";
+        this.VMeth2 = "";
+        this.VMeth3 = ""; 
+    }
+    
+    public void setVMname(String newVMname)
+    {
+        this.VMname = newVMname;
+    }
+    
+    public void setVMos(String newVMos)
+    {
+        this.VMos = newVMos;
+    }
+    
+    public void setVMversion(String newVMversion)
+    {
+        this.VMversion = newVMversion;
+    }
+   
+    public void setVMsource(String newVMsource)
+    {
+        this.VMsource = newVMsource;
+    }
+    
+    public void setVMeth0(String newVMeth0)
+    {
+        this.VMeth0 = newVMeth0;
+    }
+    
+    public void setVMeth1(String newVMeth1)
+    {
+        this.VMeth1 = newVMeth1;
+    }
+    
+    public void setVMeth2(String newVMeth2)
+    {
+        this.VMeth2 = newVMeth2;
+    }
+    
+    public void setVMeth3(String newVMeth3)
+    {
+        this.VMeth3 = newVMeth3;
+    }
+    
+    public String getVMname()
+    {
+        return VMname;
+    }
+    
+    public String getVMos()
+    {
+        return VMos;
+    }
+    
+    public String getVMversion()
+    {
+        return VMversion;
+    }
+    
+    public String getVMsource()
+    {
+        return VMsource;
+    }
+    
+    public String getVMeth0()
+    {
+        return VMeth0;
+    }
+    
+    public String getVMeth1()
+    {
+        return VMeth1;
+    }
+    
+    public String getVMeth2()
+    {
+        return VMeth2;
+    }
+    
+    public String getVMeth3()
+    {
+        return VMeth3;
+    }
+    
+    public void resetVM()
+    {
+        this.VMname = "";
+        this.VMos = "";
+        this.VMversion = "";
+        this.VMsource = "";
+        this.VMeth0 = "";
+        this.VMeth1 = "";
+        this.VMeth2 = "";
+        this.VMeth3 = "";
+    }
+    
+    public void deleteVM()
+    {
+        
+    }
+    
+    public void selectVM()
+    {
+        getVMname();
+        getVMos();
+        getVMversion();
+        getVMsource();
+        getVMeth0();
+        getVMeth1();
+        getVMeth2();
+        getVMeth3();
+    }
+}
