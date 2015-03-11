@@ -10,6 +10,10 @@ public class VM
     String VMeth1;
     String VMeth2;
     String VMeth3;
+    String VMconnection0;
+    String VMconnection1;
+    String VMconnection2;
+    String VMconnection3;
     
     public VM()
     {
@@ -20,7 +24,11 @@ public class VM
         this.VMeth0 = "";
         this.VMeth1 = "";
         this.VMeth2 = "";
-        this.VMeth3 = ""; 
+        this.VMeth3 = "";
+        this.VMconnection0 = null;
+        this.VMconnection1 = null;
+        this.VMconnection2 = null;
+        this.VMconnection3 = null;
     }
     
     public void setVMname(String newVMname)
