@@ -70,10 +70,10 @@ public class GroupOneCommandLine
 			EditDevice(vmList, hubList, vmIndex, hubIndex);
 			break;
                     case 5:
-			//DeleteDevice(VMname, VMos, VMversion, VMsource, VMindex, HubName, HubSubnet, HubNetmask, HubIndex);
+			DeleteDevice(vmList, hubList, vmIndex, hubIndex);
 			break;
                     case 6:
-			//ConnectDevices(VMname, VMos, VMversion, VMsource, VMindex, HubName, HubSubnet, HubNetmask, HubIndex);
+			ConnectDevices(vmList, hubList, vmIndex, hubIndex);
 			break;
                     case 7:
 			//System.out.print("Save Config File");
@@ -82,7 +82,7 @@ public class GroupOneCommandLine
 			//System.out.print("Load Config File");
 			break;
                     case 9:
-                        //DeleteNetwork(VMname, VMos, VMversion, VMsource, VMindex, HubName, HubSubnet, HubNetmask, HubIndex);
+                        DeleteNetwork(vmList, hubList, vmIndex, hubIndex);
 			break;
                     case 10:
 			exitProgram = true;
@@ -96,9 +96,21 @@ public class GroupOneCommandLine
         // Variable Declaration
         Scanner input = new Scanner(System.in );
         String userInput;
-        Boolean duplicateName = true;
+        Boolean duplicateVMname = true;
+        Boolean duplicateHubName = true;
         VM newVM = new VM();
         VM currentVM = new VM();
+        Hub currentHub = new Hub();
+        
+        if(vmList.isEmpty())
+        {
+            duplicateVMname = false;
+        }
+        
+        if(hubList.isEmpty())
+        {
+            duplicateHubName = false;
+        }
         
         // Add the newly created VM to the VM List.
         vmList.add(newVM);
@@ -106,29 +118,49 @@ public class GroupOneCommandLine
         // Get the size of vmList and apply it to vmIndex.
         vmIndex = vmList.size() - 1;
         
-        System.out.print("\nPlease enter the name of the selected VM: ");
+        System.out.print("\nPlease enter the name of the new VM: ");
         userInput = input.nextLine();
         
-        // Checks to see if the requested name already exists in vmList.
+        // Checks to see if the requested name already exists in vmList or hubList.
         // If it does, keep asking until receiving a new, unique name.
-        while(duplicateName == true)
+        while(duplicateVMname == true || duplicateHubName == true)
         {
+            // Check to see if the requested name exists as a VM.
             for(int i = 0; i < vmList.size(); i++)
             {
                 currentVM = (VM)vmList.get(i);
                 
                 if(userInput.equals(currentVM.getVMname()))
                 {
-                    System.out.print("\nVM already exists. Please enter a UNIQUE name for the VM: ");
-                    userInput = input.nextLine();
-                    duplicateName = true;
+                    duplicateVMname = true;
                     i = vmList.size() + 1;
                 }
                 else
                 {
-                    duplicateName = false;
+                    duplicateVMname = false;
                 }
             }
+            // Check to see if the requested name exists as a Hub.
+            for(int i = 0; i < hubList.size(); i++)
+            {
+                currentHub = (Hub)hubList.get(i);
+                
+                if(userInput.equals(currentHub.getHubName()))
+                {
+                    duplicateHubName = true;
+                    i = hubList.size() + 1;
+                }
+                else
+                {
+                    duplicateHubName = false;
+                }
+            }
+            if(duplicateVMname == true || duplicateHubName == true)
+            {
+                System.out.print("The device, " + userInput + " already exists as a VM or a Hub.");
+                System.out.print("\n\nPlease enter a UNIQUE name for the new VM: ");
+                userInput = input.nextLine();
+            }           
         }
         
         // Add the name of the new VM object to the list.
@@ -163,9 +195,21 @@ public class GroupOneCommandLine
         // Variable Declaration
         Scanner input = new Scanner(System.in );
         String userInput;
-        Boolean duplicateName = true;
+        Boolean duplicateHubName = true;
+        Boolean duplicateVMname = true;
         Hub newHub = new Hub();
         Hub currentHub = new Hub();
+        VM currentVM = new VM();
+        
+        if(hubList.isEmpty())
+        {
+            duplicateVMname = false;
+        }
+        
+        if(vmList.isEmpty())
+        {
+            duplicateHubName = false;
+        }
         
         // Add the newly created Hub to the Hub List.
         hubList.add(newHub);
@@ -173,28 +217,48 @@ public class GroupOneCommandLine
         // Get the size of hubList and apply it to hubIndex.
         hubIndex = hubList.size() - 1;
         
-        System.out.print("\nPlease enter the name of the selected Hub: ");
+        System.out.print("\nPlease enter the name of the new Hub: ");
         userInput = input.nextLine();
         
         // Checks to see if the requested name already exists in hubList.
         // If it does, keep asking until receiving a new, unique name.
-        while(duplicateName == true)
+        while(duplicateHubName == true || duplicateVMname == true)
         {
+            // Checks to see if the requested name exists as a Hub.
             for(int i = 0; i < hubList.size(); i++)
             {
                 currentHub = (Hub)hubList.get(i);
                 
                 if(userInput.equals(currentHub.getHubName()))
                 {
-                    System.out.print("\nHub already exists. Please enter a UNIQUE name for the Hub: ");
-                    userInput = input.nextLine();
-                    duplicateName = true;
+                    duplicateHubName = true;
                     i = hubList.size() + 1;
                 }
                 else
                 {
-                    duplicateName = false;
+                    duplicateHubName = false;
                 }
+            }
+            // Checks to see if the requested name exists as a VM.
+            for(int i = 0; i < vmList.size(); i++)
+            {
+                currentVM = (VM)vmList.get(i);
+                
+                if(userInput.equals(currentVM.getVMname()))
+                {
+                    duplicateVMname = true;
+                    i = vmList.size() + 1;
+                }
+                else
+                {
+                    duplicateVMname = false;
+                }
+            }
+            if(duplicateVMname == true || duplicateHubName == true)
+            {
+                System.out.print("The device, " + userInput + " already exists as a VM or a Hub.");
+                System.out.print("\n\nPlease enter a UNIQUE name for the new Hub: ");
+                userInput = input.nextLine();
             }
         }
         
@@ -206,7 +270,7 @@ public class GroupOneCommandLine
 	userInput = input.nextLine();
 	currentHub.setHubSubnet(userInput);
         
-        // Takes in the desired OS Version the user would like for the VM.
+        // Takes in the desired Netmask the user would like for the Hub.
 	System.out.print("Please enter a NetMask for Hub: ");
 	userInput = input.nextLine();
 	currentHub.setHubNetmask(userInput);
@@ -230,7 +294,13 @@ public class GroupOneCommandLine
         System.out.print("\nWhat is the EXACT name of the device you would like to view?: ");
         userInput = input.nextLine();
         
-        if(vmList.size() > 0)
+        // Checks to see if the requested device exists in vmList or hubList.
+        // If it does, run the method that corresponds to that device, which returns all values of that device.
+        if(vmList.isEmpty())
+        {
+            vmExists = false;
+        }
+        else
         {
             for(int i = 0; i < vmList.size(); i++)
             {
@@ -238,8 +308,9 @@ public class GroupOneCommandLine
             
                 if(userInput.equals(currentVM.getVMname()))
                 {
-                    i = vmList.size() + 1;
                     vmIndex = i;
+                    vmExists = true;
+                    i = vmList.size() + 1;
                     ViewVM(vmList, hubList, vmIndex, hubIndex);
                 }
                 else
@@ -248,12 +319,12 @@ public class GroupOneCommandLine
                 }
             }
         }
-        else
+                
+        if(hubList.isEmpty())
         {
-            vmExists = false;
+            hubExists = false;
         }
-        
-        if(hubList.size() > 0)
+        else
         {
             for(int i = 0; i < hubList.size(); i++)
             {
@@ -261,8 +332,9 @@ public class GroupOneCommandLine
             
                 if(userInput.equals(currentHub.getHubName()))
                 {
-                    i = hubList.size() + 1;
                     hubIndex = i;
+                    hubExists = true;
+                    i = hubList.size() + 1;
                     ViewHub(vmList, hubList, vmIndex, hubIndex);
                 }
                 else
@@ -271,11 +343,7 @@ public class GroupOneCommandLine
                 }
             }
         }
-        else
-        {
-            hubExists = false;
-        }
-        
+                
         if(vmExists == false && hubExists == false)
         {
             System.out.print("\nThe device, " + userInput + ", does not exist or has not yet been entered into the program.");
@@ -305,14 +373,19 @@ public class GroupOneCommandLine
     {
         Scanner input = new Scanner(System.in );
         String userInput;
-        Boolean duplicateName = true;
         Boolean vmExists = true;
         Boolean hubExists = true;
 
-        System.out.print("\nWhat is the EXACT name of the device you would like to view?: ");
+        System.out.print("\nWhat is the EXACT name of the device you would like to edit?: ");
         userInput = input.nextLine();
         
-        if(vmList.size() > 0)
+        // Checks to see if the requested device exists in vmList or hubList.
+        // If it does, run the method that corresponds to that device, which returns all values of that device.
+        if(vmList.isEmpty())
+        {
+            vmExists = false;
+        }
+        else
         {
             for(int i = 0; i < vmList.size(); i++)
             {
@@ -320,58 +393,10 @@ public class GroupOneCommandLine
             
                 if(userInput.equals(currentVM.getVMname()))
                 {
-                    i = vmList.size() + 1;
                     vmIndex = i;
-                    
-                    System.out.print("\nPlease enter the name of the selected VM: ");
-                    userInput = input.nextLine();
-        
-                    // Checks to see if the requested name already exists in vmList.
-                    // If it does, keep asking until receiving a new, unique name.
-                    while(duplicateName == true)
-                    {
-                        for(int j = 0; j < vmList.size(); j++)
-                        {
-                            currentVM = (VM)vmList.get(j);
-                
-                            if(userInput.equals(currentVM.getVMname()))
-                            {
-                                System.out.print("\nVM already exists. Please enter a UNIQUE name for the VM: ");
-                                userInput = input.nextLine();
-                                duplicateName = true;
-                                j = vmList.size() + 1;
-                            }
-                            else
-                            {
-                                duplicateName = false;
-                            }
-                        }
-                    }
-        
-                    // Add the name of the new VM object to the list.
-                    currentVM.setVMname(userInput);
-                
-                    // Takes in the desired OS the user would like for the VM.
-                    System.out.print("Please enter an OS for the VM: ");
-	            userInput = input.nextLine();
-	            currentVM.setVMos(userInput);
-        
-                    // Takes in the desired OS Version the user would like for the VM.
-	            System.out.print("Please enter a version for the VM: ");
-	            userInput = input.nextLine();
-	            currentVM.setVMversion(userInput);
-        
-                    // Takes in the desired file source the user would like for the VM.
-                    System.out.print("Please enter a file path for the VM: ");
-                    userInput = input.nextLine();
-	            currentVM.setVMsource(userInput);
-        
-                    // Take all changes that were applied to currentVM and copy them to newVM.
-                    // Add newVM to the VM List
-                    vmList.set(vmIndex, currentVM);
-        
-                    // Show the user the results of the entered VM.
-	            ViewVM(vmList, hubList, vmIndex, hubIndex);
+                    vmExists = true;
+                    i = vmList.size() + 1;
+                    EditVM(vmList, hubList, vmIndex, hubIndex);
                 }
                 else
                 {
@@ -379,12 +404,12 @@ public class GroupOneCommandLine
                 }
             }
         }
-        else
+                
+        if(hubList.isEmpty())
         {
-            vmExists = false;
+            hubExists = false;
         }
-        
-        if(hubList.size() > 0)
+        else
         {
             for(int i = 0; i < hubList.size(); i++)
             {
@@ -392,8 +417,10 @@ public class GroupOneCommandLine
             
                 if(userInput.equals(currentHub.getHubName()))
                 {
-                    i = hubList.size() + 1;
                     hubIndex = i;
+                    hubExists = true;
+                    i = hubList.size() + 1;
+                    EditHub(vmList, hubList, vmIndex, hubIndex);
                 }
                 else
                 {
@@ -401,15 +428,384 @@ public class GroupOneCommandLine
                 }
             }
         }
-        else
-        {
-            hubExists = false;
-        }
-        
+                
         if(vmExists == false && hubExists == false)
         {
             System.out.print("\nThe device, " + userInput + ", does not exist or has not yet been entered into the program.");
         }
     }
-}
+    
+    public static void EditVM(List vmList, List hubList, int vmIndex, int hubIndex)
+    {
+        // Variable Declaration
+        Scanner input = new Scanner(System.in );
+        String userInput;
+        Boolean duplicateVMname = true;
+        Boolean duplicateHubName = true;
+        VM editVM = (VM)vmList.get(vmIndex);
+        VM currentVM = new VM();
+        Hub currentHub = new Hub();
+        
+        if(vmList.isEmpty())
+        {
+            duplicateVMname = false;
+        }
+        
+        if(hubList.isEmpty())
+        {
+            duplicateHubName = false;
+        }
+        
+        // Resets the name of the chosen VM
+        editVM.setVMname("");
+        
+        System.out.print("Please enter the name of the new VM: ");
+        userInput = input.nextLine();
+        
+        // Checks to see if the requested name already exists in vmList or hubList.
+        // If it does, keep asking until receiving a new, unique name.
+        while(duplicateVMname == true || duplicateHubName == true)
+        {
+            // Check to see if the requested name exists as a VM.
+            for(int i = 0; i < vmList.size(); i++)
+            {
+                currentVM = (VM)vmList.get(i);
+                
+                if(userInput.equals(currentVM.getVMname()))
+                {
+                    duplicateVMname = true;
+                    i = vmList.size() + 1;
+                }
+                else
+                {
+                    duplicateVMname = false;
+                }
+            }
+            // Check to see if the requested name exists as a Hub.
+            for(int i = 0; i < hubList.size(); i++)
+            {
+                currentHub = (Hub)hubList.get(i);
+                
+                if(userInput.equals(currentHub.getHubName()))
+                {
+                    duplicateHubName = true;
+                    i = hubList.size() + 1;
+                }
+                else
+                {
+                    duplicateHubName = false;
+                }
+            }
+            if(duplicateVMname == true || duplicateHubName == true)
+            {
+                System.out.print("The device, " + userInput + " already exists as a VM or a Hub.");
+                System.out.print("\n\nPlease enter a UNIQUE name for the new VM: ");
+                userInput = input.nextLine();
+            }           
+        }
+        
+        // Add the name of the new VM object to the list.
+        editVM.setVMname(userInput);
+                
+        // Takes in the desired OS the user would like for the VM.
+        System.out.print("Please enter an OS for the VM: ");
+	userInput = input.nextLine();
+	editVM.setVMos(userInput);
+        
+        // Takes in the desired OS Version the user would like for the VM.
+	System.out.print("Please enter a version for the VM: ");
+	userInput = input.nextLine();
+	editVM.setVMversion(userInput);
+        
+        // Takes in the desired file source the user would like for the VM.
+        System.out.print("Please enter a file path for the VM: ");
+        userInput = input.nextLine();
+	editVM.setVMsource(userInput);
+        
+        // Take all changes that were applied to currentVM and copy them to newVM.
+        // Add newVM to the VM List
+        vmList.set(vmIndex, editVM);
+        
+        // Show the user the results of the entered VM.
+	ViewVM(vmList, hubList, vmIndex, hubIndex);
+    }
+    
+    public static void EditHub(List vmList, List hubList, int vmIndex, int hubIndex)
+    {
+        // Variable Declaration
+        Scanner input = new Scanner(System.in );
+        String userInput;
+        Boolean duplicateHubName = true;
+        Boolean duplicateVMname = true;
+        Hub editHub = (Hub)hubList.get(hubIndex);
+        Hub currentHub = new Hub();
+        VM currentVM = new VM();
+        
+        if(hubList.isEmpty())
+        {
+            duplicateVMname = false;
+        }
+        
+        if(vmList.isEmpty())
+        {
+            duplicateHubName = false;
+        }
+        
+        // Resets the name of the chosen Hub
+        editHub.setHubName("");
+        
+        System.out.print("\nPlease enter the name of the new Hub: ");
+        userInput = input.nextLine();
+        
+        // Checks to see if the requested name already exists in hubList.
+        // If it does, keep asking until receiving a new, unique name.
+        while(duplicateHubName == true || duplicateVMname == true)
+        {
+            // Checks to see if the requested name exists as a Hub.
+            for(int i = 0; i < hubList.size(); i++)
+            {
+                currentHub = (Hub)hubList.get(i);
+                
+                if(userInput.equals(currentHub.getHubName()))
+                {
+                    duplicateHubName = true;
+                    i = hubList.size() + 1;
+                }
+                else
+                {
+                    duplicateHubName = false;
+                }
+            }
+            // Checks to see if the requested name exists as a VM.
+            for(int i = 0; i < vmList.size(); i++)
+            {
+                currentVM = (VM)vmList.get(i);
+                
+                if(userInput.equals(currentVM.getVMname()))
+                {
+                    duplicateVMname = true;
+                    i = vmList.size() + 1;
+                }
+                else
+                {
+                    duplicateVMname = false;
+                }
+            }
+            if(duplicateVMname == true || duplicateHubName == true)
+            {
+                System.out.print("The device, " + userInput + " already exists as a VM or a Hub.");
+                System.out.print("\n\nPlease enter a UNIQUE name for the new Hub: ");
+                userInput = input.nextLine();
+            }
+        }
+        
+        // Add the name of the new VM object to the list.
+        editHub.setHubName(userInput);
+                
+        // Takes in the desired Subnet the user would like for the Hub.
+        System.out.print("Please enter a Subnet for Hub: ");
+	userInput = input.nextLine();
+	editHub.setHubSubnet(userInput);
+        
+        // Takes in the desired Netmask the user would like for the Hub.
+	System.out.print("Please enter a NetMask for Hub: ");
+	userInput = input.nextLine();
+	editHub.setHubNetmask(userInput);
+        
+        // Take all changes that were applied to currentVM and copy them to newVM.
+        // Add newVM to the VM List
+        hubList.set(hubIndex, editHub);
+        
+        // Show the user the results of the entered VM.
+	ViewHub(vmList, hubList, vmIndex, hubIndex);
+    }
+    
+    public static void DeleteDevice(List vmList, List hubList, int vmIndex, int hubIndex)
+    {
+        Scanner input = new Scanner(System.in );
+        String userInput;
+        Boolean vmExists = true;
+        Boolean hubExists = true;
 
+        System.out.print("\nWhat is the EXACT name of the device you would like to delete?: ");
+        userInput = input.nextLine();
+        
+        // Checks to see if the requested device exists in vmList or hubList.
+        // If it does, run the method that corresponds to that device, which returns all values of that device.
+        if(vmList.isEmpty())
+        {
+            vmExists = false;
+        }
+        else
+        {
+            for(int i = 0; i < vmList.size(); i++)
+            {
+                VM currentVM = (VM)vmList.get(i);
+            
+                if(userInput.equals(currentVM.getVMname()))
+                {
+                    vmList.set(i, null);
+                    vmList.remove(i);
+                    System.out.print("VM, " + userInput + ", was successfully deleted from the Current VMs List!");
+                    vmExists = true;
+                    i = vmList.size() + 1;
+                }
+                else
+                {
+                    vmExists = false;
+                }
+            }
+        }
+                
+        if(hubList.isEmpty())
+        {
+            hubExists = false;
+        }
+        else
+        {
+            for(int i = 0; i < hubList.size(); i++)
+            {
+                Hub currentHub = (Hub)hubList.get(i);
+            
+                if(userInput.equals(currentHub.getHubName()))
+                {
+                    hubList.set(i, null);
+                    hubList.remove(i);
+                    System.out.print("Hub," + userInput + ", was successfully deleted from the Current Hubs List!");
+                    hubExists = true;
+                    i = hubList.size() + 1;
+                }
+                else
+                {
+                    hubExists = false;
+                }
+            }
+        }
+                
+        if(vmExists == false && hubExists == false)
+        {
+            System.out.print("\nThe device, " + userInput + ", does not exist or has not yet been entered into the program.");
+        }
+    }
+    
+    public static void ConnectDevices(List vmList, List hubList, int vmIndex, int hubIndex)
+    {
+        // Variable Declaration
+        Scanner input = new Scanner(System.in );
+        String userInput;
+        
+        Boolean vmExists = true;
+
+        System.out.print("\nWhat is the EXACT name of the VM you would like to setup for a connection?: ");
+        userInput = input.nextLine();
+        
+        // Checks to see if the requested device exists in vmList or hubList.
+        // If it does, run the method that corresponds to that device, which returns all values of that device.
+        if(vmList.isEmpty())
+        {
+            vmExists = false;
+        }
+        else if(hubList.isEmpty())
+        {
+            System.out.print("There are currently no Hubs to connect to.");
+        }
+        else
+        {
+            for(int i = 0; i < vmList.size(); i++)
+            {
+                VM currentVM = (VM)vmList.get(i);
+            
+                if(userInput.equals(currentVM.getVMname()))
+                {
+                    vmIndex = i;
+                    vmExists = true;
+                    i = vmList.size() + 1;
+                    MakeConnection(vmList, hubList, vmIndex, hubIndex);
+                }
+                else
+                {
+                    vmExists = false;
+                }
+            }
+        }
+                
+        if(vmExists == false)
+        {
+            System.out.print("\nThe device, '" + userInput + "', does not exist or has not yet been entered into the program.");
+        }
+    }
+    
+    public static void MakeConnection(List vmList, List hubList, int vmIndex, int hubIndex)
+    {
+        // Variable Declaration
+        Scanner input = new Scanner(System.in );
+        String userInput;
+        VM editVM = (VM)vmList.get(vmIndex);
+        VM currentVM = new VM();
+        
+        System.out.print("\nWould you like to connect '" + editVM.getVMname() +"' to a Hub?: ");
+        userInput = input.nextLine();
+        
+        if(userInput.equals("y") || userInput.equals("Y"))
+        {
+            for(int i = 1; i <= 4; i++)
+            {
+                // Print out current Hubs in the hubList.
+                System.out.print("\nCurrent Hubs: ");
+                for(int j = 0; j < hubList.size(); j++)
+                {
+                    if()
+                    {
+                        
+                    }
+                    else
+                    {
+                        
+                    }
+                    Hub currentHub = (Hub)hubList.get(i);
+                    System.out.print(currentHub.getHubName() + ", ");
+                }
+            }
+        }
+        
+    }
+    
+    public static void DeleteNetwork(List vmList, List hubList, int vmIndex, int hubIndex)
+    {
+        // Variable Declaration
+        Scanner input = new Scanner(System.in );
+        String userInput;
+        VM currentVM = new VM();
+        Hub currentHub = new Hub();
+        
+        System.out.print("\nAre you sure you would like to delete the entire network configuration?");
+        System.out.print("\nThis will permanently delete all VMs, Hubs, and Network Configurations!: ");
+
+        userInput = input.next();
+        
+        if(userInput.equals("y") || userInput.equals("Y"))
+        {
+            // Set all VM objects to NULL so they are removed from memory.
+            for(int i = 0; i < vmList.size(); i++)
+            {
+                vmList.set(i, null);
+            }    
+            vmList.clear();
+            vmIndex = -1;
+            
+            // Set all Hub objects to NULL so they are removed from memory.
+            for(int i = 0; i < hubList.size(); i++)
+            {
+                hubList.set(i, null);
+            }   
+            hubList.clear();
+            hubIndex= -1;
+            
+            System.out.print("\nThe Network Configuration was deleted!");
+        }
+        else
+        {
+            System.out.print("\nDeleting the Network Configuration was cancelled!");
+        }
+    }
+}
