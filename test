@@ -1,17 +1,19 @@
 package grouponecommandline;
 
 import java.util.*;
+import java.io.*;
 
 public class GroupOneCommandLine
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws IOException
     {
         // Variable Declarations
         boolean exitProgram = false;
-        int userChoice;
+        String userChoice;
         Scanner input = new Scanner(System. in );
         List vmList = new ArrayList();
         List hubList = new ArrayList();
+        List infList = new ArrayList();
         int vmIndex = -1;
         int hubIndex = -1;
 
@@ -51,40 +53,40 @@ public class GroupOneCommandLine
             }
                         
             System.out.print("\n\n");
-            userChoice = input.nextInt();
+            userChoice = input.nextLine();
 
             // Takes in user's choice and runs the following function.
-            switch (userChoice)
+            switch(userChoice)
             {
                 default: System.out.print("Incorrect Response. Please Try Again. \n");
-                    case 1:
+                    case "1":
                         AddNewVM(vmList, hubList, vmIndex, hubIndex);
 			break;
-                    case 2:
+                    case "2":
 			AddNewHub(vmList, hubList, vmIndex, hubIndex);
 			break;
-                    case 3:
+                    case "3":
 			ViewDevice(vmList, hubList, vmIndex, hubIndex);
 			break;
-                    case 4:
+                    case "4":
 			EditDevice(vmList, hubList, vmIndex, hubIndex);
 			break;
-                    case 5:
+                    case "5":
 			DeleteDevice(vmList, hubList, vmIndex, hubIndex);
 			break;
-                    case 6:
+                    case "6":
 			ConnectDevices(vmList, hubList, vmIndex, hubIndex);
 			break;
-                    case 7:
-			//System.out.print("Save Config File");
+                    case "7":
+			SaveConfigFile(vmList, hubList, vmIndex, hubIndex);
 			break;
-                    case 8:
-			//System.out.print("Load Config File");
+                    case "8":
+			//LoadConfigFile(vmList, hubList, vmIndex, hubIndex);
 			break;
-                    case 9:
+                    case "9":
                         DeleteNetwork(vmList, hubList, vmIndex, hubIndex);
 			break;
-                    case 10:
+                    case "10":
 			exitProgram = true;
 			break;
             }
@@ -358,6 +360,14 @@ public class GroupOneCommandLine
         System.out.print("\nVM OS: " + currentVM.getVMos());
         System.out.print("\nVM Version: " + currentVM.getVMversion());
         System.out.print("\nVM Source: " + currentVM.getVMsource());
+        System.out.print("\nConnection 0: " + currentVM.getVMconnect0());
+        System.out.print("\neth0: " + currentVM.getVMeth0());
+        System.out.print("\nConnection 1: " + currentVM.getVMconnect1());
+        System.out.print("\neth0: " + currentVM.getVMeth1());
+        System.out.print("\nConnection 2: " + currentVM.getVMconnect2());
+        System.out.print("\neth0: " + currentVM.getVMeth2());
+        System.out.print("\nConnection 3: " + currentVM.getVMconnect3());
+        System.out.print("\neth0: " + currentVM.getVMeth3());
     }
     
     public static void ViewHub(List vmList, List hubList, int vmIndex, int hubIndex)
@@ -626,6 +636,7 @@ public class GroupOneCommandLine
         String userInput;
         Boolean vmExists = true;
         Boolean hubExists = true;
+        
 
         System.out.print("\nWhat is the EXACT name of the device you would like to delete?: ");
         userInput = input.nextLine();
@@ -731,7 +742,7 @@ public class GroupOneCommandLine
                 
         if(vmExists == false)
         {
-            System.out.print("\nThe device, '" + userInput + "', does not exist or has not yet been entered into the program.");
+            System.out.print("The device, '" + userInput + "', does not exist or has not yet been entered into the program.");
         }
     }
     
@@ -740,34 +751,184 @@ public class GroupOneCommandLine
         // Variable Declaration
         Scanner input = new Scanner(System.in );
         String userInput;
-        VM editVM = (VM)vmList.get(vmIndex);
+        int hubsAvailable = 0;
+        Boolean hubExists = false;
         VM currentVM = new VM();
-        
-        System.out.print("\nWould you like to connect '" + editVM.getVMname() +"' to a Hub?: ");
-        userInput = input.nextLine();
-        
-        if(userInput.equals("y") || userInput.equals("Y"))
+        VM editVM = (VM)vmList.get(vmIndex);
+           
+                
+        //Set all connections to null
+        editVM.setVMconnect0(null);
+        editVM.setVMconnect1(null);
+        editVM.setVMconnect2(null);
+        editVM.setVMconnect3(null);
+
+        // Run a max of four times for the 4 maximum connections a VM can have.
+        for(int i = 0; i <= 3; i++)
         {
-            for(int i = 1; i <= 4; i++)
+            // Check to see how many Hubs are available that have not already been connected to.
+            for(int j = 0; j < hubList.size(); j++)
+            {
+                Hub currentHub = (Hub)hubList.get(j);
+                if( currentHub.getHubName().equals(editVM.getVMconnect0()) ||
+                    currentHub.getHubName().equals(editVM.getVMconnect1()) ||
+                    currentHub.getHubName().equals(editVM.getVMconnect2()) ||
+                    currentHub.getHubName().equals(editVM.getVMconnect3())    )
+                {
+                    // If this VM is already connected to a Hub in the list, skip it.
+                }
+                else
+                {
+                    hubsAvailable++;
+                }
+            }
+            
+            // Runs only if there are available hubs in the list to connect to.
+            if(hubsAvailable > 0)
             {
                 // Print out current Hubs in the hubList.
                 System.out.print("\nCurrent Hubs: ");
                 for(int j = 0; j < hubList.size(); j++)
                 {
-                    if()
+                    Hub currentHub = (Hub)hubList.get(j);
+                    
+                    if( currentHub.getHubName().equals(editVM.getVMconnect0()) ||
+                        currentHub.getHubName().equals(editVM.getVMconnect1()) ||
+                        currentHub.getHubName().equals(editVM.getVMconnect2()) ||
+                        currentHub.getHubName().equals(editVM.getVMconnect3())    )
                     {
-                        
+                    // If this VM is already connected to a Hub in the list, skip it.
                     }
                     else
                     {
-                        
+                        System.out.print(currentHub.getHubName() + ", ");
                     }
-                    Hub currentHub = (Hub)hubList.get(i);
-                    System.out.print(currentHub.getHubName() + ", ");
                 }
+                
+                System.out.print("\nWhat is the EXACT name of the Hub you would like to establish a connection to '" + editVM.getVMname() + "'?: ");
+                userInput = input.nextLine();
+                
+                while(hubExists == false)
+                {
+                    for(int j = 0; j < hubList.size(); j++)
+                    {
+                        Hub currentHub = (Hub)hubList.get(j);
+        
+                        if(userInput.equals(currentHub.getHubName()))
+                        {
+                            if( userInput.equals(editVM.getVMconnect0()) ||
+                                userInput.equals(editVM.getVMconnect1()) ||
+                                userInput.equals(editVM.getVMconnect2()) ||
+                                userInput.equals(editVM.getVMconnect3())    )
+                            {
+                                hubExists = false;
+                            }
+                            else
+                            {
+                               hubExists = true;
+                                j = hubList.size() + 1; 
+                            }
+                        }
+                        else
+                        {
+                            hubExists = false;
+                        }
+                    }
+                    
+                    if(hubExists == false)
+                    {
+                        System.out.print("The device, '" + userInput + "', does not exist or has not yet been entered into the program.");
+                        System.out.print("\n\nPlease enter the EXACT name of the Hub you would like to establish a connection to '" + editVM.getVMname() + "': ");
+                        userInput = input.nextLine();
+                    }
+                }
+                
+                // Connect the selected Hub to the current VM.
+                switch(i)
+                {
+                    case 0:
+                        editVM.setVMconnect0(userInput);
+                        System.out.print("What is the IP Address of eth0 that is connected to '" + userInput + "'?: ");
+                        userInput = input.nextLine();
+                        editVM.setVMeth0(userInput);
+                        break;
+                    case 1:
+                        editVM.setVMconnect1(userInput);
+                        System.out.print("What is the IP Address of eth1 that is connected to '" + userInput + "'?: ");
+                        userInput = input.nextLine();
+                        editVM.setVMeth1(userInput);
+                        break;
+                    case 2:
+                        editVM.setVMconnect2(userInput);
+                        System.out.print("What is the IP Address of eth2 that is connected to '" + userInput + "'?: ");
+                        userInput = input.nextLine();
+                        editVM.setVMeth2(userInput);
+                        break;
+                    case 3:
+                        editVM.setVMconnect3(userInput);
+                        System.out.print("What is the IP Address of eth3 that is connected to '" + userInput + "'?: ");
+                        userInput = input.nextLine();
+                        editVM.setVMeth3(userInput);
+                        break;
+                }
+                
+                if(i < 3)
+                {
+                    // Run through the connection process again for another VM or stop connecting devices?
+                    System.out.print("\nWould you like to connect another Hub to '" + editVM.getVMname() +"'?: ");
+                    userInput = input.nextLine();
+                
+                    if(userInput.equals("y") || userInput.equals("Y"))
+                    {
+                        hubsAvailable = 0;
+                        hubExists = false;
+                    }
+                    else
+                    {
+                        i = 4;
+                    }
+                }
+            }
+            else
+            {
+                i = 4;
+                System.out.print("There are no more available Hubs to connect to.\n");
             }
         }
         
+        vmList.set(vmIndex, editVM);
+        
+        /* CREATE INF INFO FOR THE HUBS  1
+       
+        
+        currentVM = new VM();
+        Hub currentHub = new Hub();
+      
+        for (int h = 0; h < vmList.size(); h++)
+        {
+            for(int y = 0; y < hubList.size(); y++)
+          {
+            
+            if(currentVM.getVMconnect0().contains(currentHub.getHubName()))
+            {
+                currentHub.setHubInf1(currentVM.getVMname());
+            }
+            if(currentVM.getVMconnect1().contains(currentHub.getHubName()))
+            {
+                currentHub.setHubInf2(currentVM.getVMname());
+            }
+            if(currentVM.getVMconnect2().contains(currentHub.getHubName()))
+            {
+                currentHub.setHubInf3(currentVM.getVMname());
+            }
+            if(currentVM.getVMconnect3().contains(currentHub.getHubName()))
+            {
+                currentHub.setHubInf4(currentVM.getVMname());
+            }
+        
+     }*/
+        
+        ViewVM(vmList, hubList, vmIndex, hubIndex);
     }
     
     public static void DeleteNetwork(List vmList, List hubList, int vmIndex, int hubIndex)
@@ -808,4 +969,75 @@ public class GroupOneCommandLine
             System.out.print("\nDeleting the Network Configuration was cancelled!");
         }
     }
+    
+    public static void SaveConfigFile(List vmList, List hubList, int vmIndex, int hubIndex) throws IOException
+    {
+        // Variable Declaration
+        Scanner input = new Scanner(System. in);
+        String userChoice;
+                        
+        // Allows the user to name the output file.
+        System.out.print("\nWhat would you like to name the new outputted config file (Don't include a file extension)?: ");
+        userChoice = input.nextLine();
+        File savingConfigFile = new File(userChoice + ".cfg");
+        PrintWriter output = new PrintWriter(savingConfigFile);
+        
+        // Write the contents of each VM
+        for(int i = 0; i < vmList.size(); i++)
+        {
+            VM currentVM = (VM)vmList.get(i);
+            output.print("vm " + currentVM.getVMname() + " {\n");
+            output.print("\tos: " + currentVM.getVMos() + "\n");
+            output.print("\tver: \"" + currentVM.getVMversion() + "\"\n");
+            output.print("\tsrc: \"" + currentVM.getVMsource() + "\"\n");
+            
+            if(currentVM.getVMconnect0() != null)
+            {
+                output.print("\teth0: \"" + currentVM.getVMeth0() + "\"\n");
+            }
+            if(currentVM.getVMconnect1() != null)
+            {
+                output.print("\teth1: \"" + currentVM.getVMeth1() + "\"\n");
+            }
+            if(currentVM.getVMconnect2() != null)
+            {
+                output.print("\teth2: \"" + currentVM.getVMeth2() + "\"\n");
+            }
+            if(currentVM.getVMconnect3() != null)
+            {
+                output.print("\teth3: \"" + currentVM.getVMeth3() + "\"\n");
+            }
+            
+            output.print("}\n\n");
+        }
+        
+        // Write the contents of each Hub
+        for(int i = 0; i < hubList.size(); i++)
+        {
+            Hub currentHub = (Hub)hubList.get(i);
+            output.print("Hub " + currentHub.getHubName() + " {\n");
+            output.print("\tSubnet " + currentHub.getHubSubnet() + " \n");
+            output.print("\tNetmask " + currentHub.getHubNetmask() + "\n");
+            
+           // if(currentHub.HubINF != null)
+           //     for(int j = 0; j < currentHub.HubINF.size() - 1; j++)
+          
+                  {
+                    
+                }
+         
+        }
+        
+        // Write the contents of the Partial Solution
+        for(int i = 0; i < vmList.size(); i++)
+        {
+            
+        }
+        
+        output.close();
+        System.out.print("\nConfig File saved successfully!");
+    }
+    
+    
+   
 }
