@@ -13,7 +13,6 @@ public class GroupOneCommandLine
         Scanner input = new Scanner(System. in );
         List vmList = new ArrayList();
         List hubList = new ArrayList();
-        List infList = new ArrayList();
         int vmIndex = -1;
         int hubIndex = -1;
 
@@ -21,7 +20,7 @@ public class GroupOneCommandLine
         System.out.print("Welcome to the Group 1 Command Line Project.");
         
         // Loop to stay inside the program.
-	while (exitProgram == false)
+        while (exitProgram == false)
         {
             // Give the user choices to run through the program.
             System.out.print("\n\nPlease select an option from the below list.");
@@ -59,36 +58,36 @@ public class GroupOneCommandLine
             switch(userChoice)
             {
                 default: System.out.print("Incorrect Response. Please Try Again. \n");
-                    case "1":
-                        AddNewVM(vmList, hubList, vmIndex, hubIndex);
-			break;
-                    case "2":
-			AddNewHub(vmList, hubList, vmIndex, hubIndex);
-			break;
-                    case "3":
-			ViewDevice(vmList, hubList, vmIndex, hubIndex);
-			break;
-                    case "4":
-			EditDevice(vmList, hubList, vmIndex, hubIndex);
-			break;
-                    case "5":
-			DeleteDevice(vmList, hubList, vmIndex, hubIndex);
-			break;
-                    case "6":
-			ConnectDevices(vmList, hubList, vmIndex, hubIndex);
-			break;
-                    case "7":
-			SaveConfigFile(vmList, hubList, vmIndex, hubIndex);
-			break;
-                    case "8":
-			//LoadConfigFile(vmList, hubList, vmIndex, hubIndex);
-			break;
-                    case "9":
-                        DeleteNetwork(vmList, hubList, vmIndex, hubIndex);
-			break;
-                    case "10":
-			exitProgram = true;
-			break;
+                case "1":
+                    AddNewVM(vmList, hubList, vmIndex, hubIndex);
+                    break;
+                case "2":
+                    AddNewHub(vmList, hubList, vmIndex, hubIndex);
+                    break;
+                case "3":
+                    ViewDevice(vmList, hubList, vmIndex, hubIndex);
+                    break;
+                case "4":
+                    EditDevice(vmList, hubList, vmIndex, hubIndex);
+                    break;
+                case "5":
+                    DeleteDevice(vmList, hubList, vmIndex, hubIndex);
+                    break;
+                case "6":
+                    ConnectDevices(vmList, hubList, vmIndex, hubIndex);
+                    break;
+                case "7":
+                    SaveConfigFile(vmList, hubList, vmIndex, hubIndex);
+                    break;
+                case "8":
+                    //LoadConfigFile(vmList, hubList, vmIndex, hubIndex);
+                    break;
+                case "9":
+                    DeleteNetwork(vmList, hubList, vmIndex, hubIndex);
+                    break;
+                case "10":
+                    exitProgram = true;
+                    break;
             }
         }
     }
@@ -170,18 +169,18 @@ public class GroupOneCommandLine
                 
         // Takes in the desired OS the user would like for the VM.
         System.out.print("Please enter an OS for the VM: ");
-	userInput = input.nextLine();
-	currentVM.setVMos(userInput);
+        userInput = input.nextLine();
+        currentVM.setVMos(userInput);
         
         // Takes in the desired OS Version the user would like for the VM.
-	System.out.print("Please enter a version for the VM: ");
-	userInput = input.nextLine();
-	currentVM.setVMversion(userInput);
+        System.out.print("Please enter a version for the VM: ");
+        userInput = input.nextLine();
+        currentVM.setVMversion(userInput);
         
         // Takes in the desired file source the user would like for the VM.
         System.out.print("Please enter a file path for the VM: ");
         userInput = input.nextLine();
-	currentVM.setVMsource(userInput);
+        currentVM.setVMsource(userInput);
         
         // Take all changes that were applied to currentVM and copy them to newVM.
         // Add newVM to the VM List
@@ -189,7 +188,7 @@ public class GroupOneCommandLine
         vmList.set(vmIndex, newVM);
         
         // Show the user the results of the entered VM.
-	ViewVM(vmList, hubList, vmIndex, hubIndex);
+        ViewVM(vmList, hubList, vmIndex, hubIndex);
     }
     
     public static void AddNewHub(List vmList, List hubList, int vmIndex, int hubIndex)
@@ -269,13 +268,13 @@ public class GroupOneCommandLine
                 
         // Takes in the desired Subnet the user would like for the Hub.
         System.out.print("Please enter a Subnet for Hub: ");
-	userInput = input.nextLine();
-	currentHub.setHubSubnet(userInput);
+        userInput = input.nextLine();
+        currentHub.setHubSubnet(userInput);
         
         // Takes in the desired Netmask the user would like for the Hub.
-	System.out.print("Please enter a NetMask for Hub: ");
-	userInput = input.nextLine();
-	currentHub.setHubNetmask(userInput);
+        System.out.print("Please enter a NetMask for Hub: ");
+        userInput = input.nextLine();
+        currentHub.setHubNetmask(userInput);
         
         // Take all changes that were applied to currentVM and copy them to newVM.
         // Add newVM to the VM List
@@ -283,7 +282,7 @@ public class GroupOneCommandLine
         hubList.set(hubIndex, newHub);
         
         // Show the user the results of the entered VM.
-	ViewHub(vmList, hubList, vmIndex, hubIndex);
+        ViewHub(vmList, hubList, vmIndex, hubIndex);
     }
     
     public static void ViewDevice(List vmList, List hubList, int vmIndex, int hubIndex)
@@ -519,25 +518,25 @@ public class GroupOneCommandLine
                 
         // Takes in the desired OS the user would like for the VM.
         System.out.print("Please enter an OS for the VM: ");
-	userInput = input.nextLine();
-	editVM.setVMos(userInput);
+        userInput = input.nextLine();
+        editVM.setVMos(userInput);
         
         // Takes in the desired OS Version the user would like for the VM.
-	System.out.print("Please enter a version for the VM: ");
-	userInput = input.nextLine();
-	editVM.setVMversion(userInput);
+        System.out.print("Please enter a version for the VM: ");
+        userInput = input.nextLine();
+        editVM.setVMversion(userInput);
         
         // Takes in the desired file source the user would like for the VM.
         System.out.print("Please enter a file path for the VM: ");
         userInput = input.nextLine();
-	editVM.setVMsource(userInput);
+        editVM.setVMsource(userInput);
         
         // Take all changes that were applied to currentVM and copy them to newVM.
         // Add newVM to the VM List
         vmList.set(vmIndex, editVM);
         
         // Show the user the results of the entered VM.
-	ViewVM(vmList, hubList, vmIndex, hubIndex);
+    ViewVM(vmList, hubList, vmIndex, hubIndex);
     }
     
     public static void EditHub(List vmList, List hubList, int vmIndex, int hubIndex)
@@ -614,20 +613,20 @@ public class GroupOneCommandLine
                 
         // Takes in the desired Subnet the user would like for the Hub.
         System.out.print("Please enter a Subnet for Hub: ");
-	userInput = input.nextLine();
-	editHub.setHubSubnet(userInput);
+        userInput = input.nextLine();
+        editHub.setHubSubnet(userInput);
         
         // Takes in the desired Netmask the user would like for the Hub.
-	System.out.print("Please enter a NetMask for Hub: ");
-	userInput = input.nextLine();
-	editHub.setHubNetmask(userInput);
+        System.out.print("Please enter a NetMask for Hub: ");
+        userInput = input.nextLine();
+        editHub.setHubNetmask(userInput);
         
         // Take all changes that were applied to currentVM and copy them to newVM.
         // Add newVM to the VM List
         hubList.set(hubIndex, editHub);
         
         // Show the user the results of the entered VM.
-	ViewHub(vmList, hubList, vmIndex, hubIndex);
+        ViewHub(vmList, hubList, vmIndex, hubIndex);
     }
     
     public static void DeleteDevice(List vmList, List hubList, int vmIndex, int hubIndex)
@@ -753,15 +752,27 @@ public class GroupOneCommandLine
         String userInput;
         int hubsAvailable = 0;
         Boolean hubExists = false;
-        VM currentVM = new VM();
         VM editVM = (VM)vmList.get(vmIndex);
+        Hub editHub = new Hub();
            
-                
-        //Set all connections to null
+        // Set all VM connections to null and delete all HubINF entries for this VM.
         editVM.setVMconnect0(null);
         editVM.setVMconnect1(null);
         editVM.setVMconnect2(null);
         editVM.setVMconnect3(null);
+        
+        for(int j = 0; j < hubList.size(); j++)
+        {
+            Hub currentHub = (Hub)hubList.get(j);
+            
+            // Does currentHub's INF contain editVM's name?
+            if(currentHub.getHubINF().contains(editVM.getVMname()))
+            {
+                editHub = currentHub;
+                editHub.deleteHubINF(j);
+                hubList.set(j, editHub);
+            }
+        }
 
         // Run a max of four times for the 4 maximum connections a VM can have.
         for(int i = 0; i <= 3; i++)
@@ -826,7 +837,7 @@ public class GroupOneCommandLine
                             else
                             {
                                hubExists = true;
-                                j = hubList.size() + 1; 
+                               j = hubList.size() + 1; 
                             }
                         }
                         else
@@ -848,29 +859,48 @@ public class GroupOneCommandLine
                 {
                     case 0:
                         editVM.setVMconnect0(userInput);
+                        
                         System.out.print("What is the IP Address of eth0 that is connected to '" + userInput + "'?: ");
                         userInput = input.nextLine();
                         editVM.setVMeth0(userInput);
                         break;
                     case 1:
                         editVM.setVMconnect1(userInput);
+                        
                         System.out.print("What is the IP Address of eth1 that is connected to '" + userInput + "'?: ");
                         userInput = input.nextLine();
                         editVM.setVMeth1(userInput);
                         break;
                     case 2:
                         editVM.setVMconnect2(userInput);
+                        
                         System.out.print("What is the IP Address of eth2 that is connected to '" + userInput + "'?: ");
                         userInput = input.nextLine();
                         editVM.setVMeth2(userInput);
                         break;
                     case 3:
                         editVM.setVMconnect3(userInput);
+                        
                         System.out.print("What is the IP Address of eth3 that is connected to '" + userInput + "'?: ");
                         userInput = input.nextLine();
                         editVM.setVMeth3(userInput);
                         break;
                 }
+                
+                // Writes the name of the VM and the VM's eth# port to the HubINF List.
+                for(int j = 0; j < hubList.size(); j++)
+                {
+                    Hub currentHub = (Hub)hubList.get(j);
+                    if(userInput.equals(currentHub.getHubName()))
+                    {
+                        editHub = currentHub;
+                        editHub.setHubINF(editVM.getVMname() + ".eth" + i);
+                        hubIndex = j;
+                        j = hubList.size() + 1;
+                    }
+                }
+                hubList.set(hubIndex, editHub);
+
                 
                 if(i < 3)
                 {
@@ -897,37 +927,6 @@ public class GroupOneCommandLine
         }
         
         vmList.set(vmIndex, editVM);
-        
-        /* CREATE INF INFO FOR THE HUBS  1
-       
-        
-        currentVM = new VM();
-        Hub currentHub = new Hub();
-      
-        for (int h = 0; h < vmList.size(); h++)
-        {
-            for(int y = 0; y < hubList.size(); y++)
-          {
-            
-            if(currentVM.getVMconnect0().contains(currentHub.getHubName()))
-            {
-                currentHub.setHubInf1(currentVM.getVMname());
-            }
-            if(currentVM.getVMconnect1().contains(currentHub.getHubName()))
-            {
-                currentHub.setHubInf2(currentVM.getVMname());
-            }
-            if(currentVM.getVMconnect2().contains(currentHub.getHubName()))
-            {
-                currentHub.setHubInf3(currentVM.getVMname());
-            }
-            if(currentVM.getVMconnect3().contains(currentHub.getHubName()))
-            {
-                currentHub.setHubInf4(currentVM.getVMname());
-            }
-        
-     }*/
-        
         ViewVM(vmList, hubList, vmIndex, hubIndex);
     }
     
@@ -1015,23 +1014,22 @@ public class GroupOneCommandLine
         for(int i = 0; i < hubList.size(); i++)
         {
             Hub currentHub = (Hub)hubList.get(i);
-            output.print("Hub " + currentHub.getHubName() + " {\n");
-            output.print("\tSubnet " + currentHub.getHubSubnet() + " \n");
-            output.print("\tNetmask " + currentHub.getHubNetmask() + "\n");
-            
-           // if(currentHub.HubINF != null)
-           //     for(int j = 0; j < currentHub.HubINF.size() - 1; j++)
-          
-                  {
-                    
-                }
-         
+            output.print("hub " + currentHub.getHubName() + " {\n");
+            output.print("\tinf: " + currentHub.getHubINF() + "\n");
+            output.print("\tSubnet: \"" + currentHub.getHubSubnet() + "\"\n");
+            output.print("\tNetmask: \"" + currentHub.getHubNetmask() + "\"\n");
+            output.print("}\n\n");
         }
         
         // Write the contents of the Partial Solution
         for(int i = 0; i < vmList.size(); i++)
         {
+            Hub currentHub = (Hub)hubList.get(i);
+            output.print("partial_solution " + currentHub.getHubName() + " {\n");
             
+            
+            
+            output.print("}\n\n");
         }
         
         output.close();
