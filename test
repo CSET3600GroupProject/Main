@@ -58,6 +58,7 @@ public class GroupOneCommandLine
             switch(userChoice)
             {
                 default: System.out.print("Incorrect Response. Please Try Again. \n");
+                    break;
                 case "1":
                     AddNewVM(vmList, hubList, vmIndex, hubIndex);
                     break;
@@ -362,11 +363,11 @@ public class GroupOneCommandLine
         System.out.print("\nConnection 0: " + currentVM.getVMconnect0());
         System.out.print("\neth0: " + currentVM.getVMeth0());
         System.out.print("\nConnection 1: " + currentVM.getVMconnect1());
-        System.out.print("\neth0: " + currentVM.getVMeth1());
+        System.out.print("\neth1: " + currentVM.getVMeth1());
         System.out.print("\nConnection 2: " + currentVM.getVMconnect2());
-        System.out.print("\neth0: " + currentVM.getVMeth2());
+        System.out.print("\neth2: " + currentVM.getVMeth2());
         System.out.print("\nConnection 3: " + currentVM.getVMconnect3());
-        System.out.print("\neth0: " + currentVM.getVMeth3());
+        System.out.print("\neth3: " + currentVM.getVMeth3());
     }
     
     public static void ViewHub(List vmList, List hubList, int vmIndex, int hubIndex)
@@ -741,7 +742,7 @@ public class GroupOneCommandLine
                 
         if(vmExists == false)
         {
-            System.out.print("The device, '" + userInput + "', does not exist or has not yet been entered into the program.");
+            System.out.print("The VM, '" + userInput + "', does not exist or has not yet been entered into the program.");
         }
     }
     
@@ -750,6 +751,7 @@ public class GroupOneCommandLine
         // Variable Declaration
         Scanner input = new Scanner(System.in );
         String userInput;
+        String hubName = "";
         int hubsAvailable = 0;
         Boolean hubExists = false;
         VM editVM = (VM)vmList.get(vmIndex);
@@ -765,15 +767,18 @@ public class GroupOneCommandLine
         {
             Hub currentHub = (Hub)hubList.get(j);
             
-            // Does currentHub's INF contain editVM's name?
-            if(currentHub.getHubINF().contains(editVM.getVMname()))
+            if(currentHub.getHubINFisEmpty() == false)
             {
-                editHub = currentHub;
-                editHub.deleteHubINF(j);
-                hubList.set(j, editHub);
+                // Does currentHub's INF contain editVM's name?
+                if(currentHub.getHubINF().contains(editVM.getVMname()))
+                {
+                    editHub = (Hub)currentHub;
+                    editHub.deleteHubINF(editVM.getVMname());
+                    hubList.set(j, editHub);
+                }
             }
         }
-
+        
         // Run a max of four times for the 4 maximum connections a VM can have.
         for(int i = 0; i <= 3; i++)
         {
@@ -837,6 +842,7 @@ public class GroupOneCommandLine
                             else
                             {
                                hubExists = true;
+                               hubName = userInput;
                                j = hubList.size() + 1; 
                             }
                         }
@@ -848,7 +854,7 @@ public class GroupOneCommandLine
                     
                     if(hubExists == false)
                     {
-                        System.out.print("The device, '" + userInput + "', does not exist or has not yet been entered into the program.");
+                        System.out.print("The Hub, '" + userInput + "', does not exist or has not yet been entered into the program.");
                         System.out.print("\n\nPlease enter the EXACT name of the Hub you would like to establish a connection to '" + editVM.getVMname() + "': ");
                         userInput = input.nextLine();
                     }
@@ -891,9 +897,9 @@ public class GroupOneCommandLine
                 for(int j = 0; j < hubList.size(); j++)
                 {
                     Hub currentHub = (Hub)hubList.get(j);
-                    if(userInput.equals(currentHub.getHubName()))
+                    if(hubName.equals(currentHub.getHubName()))
                     {
-                        editHub = currentHub;
+                        editHub = (Hub)currentHub;
                         editHub.setHubINF(editVM.getVMname() + ".eth" + i);
                         hubIndex = j;
                         j = hubList.size() + 1;
@@ -1016,26 +1022,23 @@ public class GroupOneCommandLine
             Hub currentHub = (Hub)hubList.get(i);
             output.print("hub " + currentHub.getHubName() + " {\n");
             output.print("\tinf: " + currentHub.getHubINF() + "\n");
-            output.print("\tSubnet: \"" + currentHub.getHubSubnet() + "\"\n");
-            output.print("\tNetmask: \"" + currentHub.getHubNetmask() + "\"\n");
+            output.print("\tsubnet: \"" + currentHub.getHubSubnet() + "\"\n");
+            output.print("\tnetmask: \"" + currentHub.getHubNetmask() + "\"\n");
             output.print("}\n\n");
         }
         
         // Write the contents of the Partial Solution
-        for(int i = 0; i < vmList.size(); i++)
+        output.print("partial_solution {\n");
+        for(int i = 0; i < hubList.size(); i++)
         {
             Hub currentHub = (Hub)hubList.get(i);
-            output.print("partial_solution " + currentHub.getHubName() + " {\n");
-            
-            
-            
-            output.print("}\n\n");
         }
+        output.print("}\n");
         
         output.close();
         System.out.print("\nConfig File saved successfully!");
     }
     
     
-   
+
 }
