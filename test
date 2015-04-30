@@ -1,1044 +1,1845 @@
-package grouponecommandline;
+/*
+* @ Group 1
+* @ Austin Howard, Jason Brown, Matthew Buehrle, Matthew Martin, Ryan Cleghorn
+* @ Final Project - VNet-LabGUI
+* @ CSET 3600 - 901
+* @ Weiqing Sun
+* @ 04/27/2015
+*/
 
-import java.util.*;
+package grouponegui;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.*;
+import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
+import java.util.*;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class GroupOneCommandLine
+public class GroupOneGUI extends JPanel implements ActionListener
 {
-    public static void main(String[] args) throws IOException
+    static private final String newline = "\n";
+    public static JFrame frame;
+    public static JEditorPane eP;
+    public static JFileChooser fc;
+    public static JPanel p1, p2, p3, p4, vmPan, hubPane, vmPane, hubPan, netTopol, vmNames, innerpane1, innerpane2;
+    public static JTextArea cFile;
+    public static JList listInf;
+    public static JTabbedPane panelHolder;
+    public static JComboBox cbOS,cbVer,cbCnts1,cbCnts2, cbCnts0, cbCnts3; 
+    public static JTextField tfName, tfSrc, tfName1, tfSubnet, tfNetmask, tfInf, vmSwitchName, vmHostName, tfCnts0, tfCnts1, tfCnts2, tfCnts3;
+    public static JButton vM, hub, viwNetTopol, viwCFile, l, exit, brows, delt, rst, saveFile, loadFile, canvasVM, canvasHub, savVm, delVm, rstHub, savHub, delHub, helpButt;
+    public static int click, clicks, vmIndex, hubIndex, previousHub0, previousHub1, previousHub2, previousHub3;
+    public static int canvasVMIndex = -1;
+    public static int canvasHubIndex = -1;
+    public static JLabel emp1,emp2,emp3,emp4,vsn;
+    public static String[] strOS = {"", "WINDOWS", "LINUX", "OS X" };
+    public static ImageIcon vMs, hubs;
+    
+    // Variable Declarations
+    java.util.List vmList = new ArrayList();
+    java.util.List hubList = new ArrayList();
+    java.util.List canvasVMList = new ArrayList();
+    java.util.List canvasHubList = new ArrayList();
+    java.util.List netTopolList = new ArrayList();
+    
+    public GroupOneGUI()
     {
-        // Variable Declarations
-        boolean exitProgram = false;
-        String userChoice;
-        Scanner input = new Scanner(System. in );
-        List vmList = new ArrayList();
-        List hubList = new ArrayList();
-        int vmIndex = -1;
-        int hubIndex = -1;
+        //file chooser to open a file location
+        fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
-        // Announce the Program.
-        System.out.print("Welcome to the Group 1 Command Line Project.");
-        
-        // Loop to stay inside the program.
-        while (exitProgram == false)
+        //The label indicating where to but in the information
+        //for the VMs
+        JLabel vmNam = new JLabel("<html><u>Virtual Machine</u></html>");
+        JLabel hubNam = new JLabel("<html><u>Hub</u></html>");
+        JLabel subnet = new JLabel("Subnet");
+        JLabel netmask = new JLabel("Netmask");
+        JLabel inf = new JLabel("Inf");
+        JLabel name = new JLabel("Name");
+        JLabel name2 = new JLabel("Name");
+        JLabel os = new JLabel("OS");
+        JLabel ver = new JLabel("Version");
+        JLabel src = new JLabel("Source");
+        JLabel cnt0 = new JLabel("Connects To");
+        JLabel cnt1 = new JLabel("Connects To");
+        JLabel cnt2 = new JLabel("Connects To");
+        JLabel cnt3 = new JLabel("Connects To");
+
+        //Textfield to enter in the Name of the Vm and the source
+        //location
+        tfName = new JTextField();
+        tfName.setToolTipText("<html>Enter in the name of the Virtual Machine</html>");
+        tfSrc = new JTextField();
+        tfSrc.setToolTipText("<html> Enter in the location of the ISO image that is <br> located on your computer</html>");
+        tfName1 = new JTextField();
+        tfName1.setToolTipText("<html>Enter in the name of the Hub</html>");
+        tfSubnet = new JTextField();
+        tfSubnet.setToolTipText("<html>Enter in the subnet of the Hub</html>");
+        tfNetmask = new JTextField();
+        tfNetmask.setToolTipText("<html>This is the netmask of the hubs</html>");
+        vmSwitchName = new JTextField();
+        vmSwitchName.setToolTipText("<html>This is the name of the Virtual Switch</html>");
+        vmHostName = new JTextField();
+        vmHostName.setToolTipText("<html>This is the name of the Virtual Host</html>");
+        tfInf = new JTextField();
+        tfInf.setToolTipText("<html>Enter in the infrastructure of the hub. i.e:</html>");
+        tfCnts0 = new JTextField();
+        tfCnts1 = new JTextField();
+        tfCnts2 = new JTextField();
+        tfCnts3 = new JTextField();
+        vsn = new JLabel("Add Virtual Switch Name(inf):");
+        emp1 = new JLabel("");
+        emp2 = new JLabel("");
+        emp3 = new JLabel("Add Physical Host Name:");
+        emp4 = new JLabel("");
+        java.util.List hubNameList = new ArrayList();
+        for(int i = 0; i < hubList.size(); i++)
         {
-            // Give the user choices to run through the program.
-            System.out.print("\n\nPlease select an option from the below list.");
-            System.out.print("\n1 - Add a new VM");
-            System.out.print("\n2 - Add a new Hub");
-            System.out.print("\n3 - View a Device");
-            System.out.print("\n4 - Edit a Device");
-            System.out.print("\n5 - Delete a Device");
-            System.out.print("\n6 - Connect a VM to Hubs");
-            System.out.print("\n7 - Save the Current Config File");
-            System.out.print("\n8 - Load a Config File");
-            System.out.print("\n9 - Delete Entire Network");
-            System.out.print("\n10 - Exit");
+            Hub currentHub = (Hub)hubList.get(i);
+            hubNameList.add(currentHub.getHubName());
+        }
+        hubNameList.add("");
 
-            // Print out current VMs in the vmList.
-            System.out.print("\n\nCurrent VMs: ");
-            for(int i = 0; i < vmList.size(); i++)
+        cbCnts0 = new JComboBox(hubNameList.toArray());
+        cbCnts0.setSelectedIndex(0);
+        cbCnts0.setToolTipText("<html>Select the first connection that the virtual machine <br> "
+                + "will have.</html>");
+        cbCnts1 = new JComboBox(hubNameList.toArray());
+        cbCnts1.setSelectedIndex(0);
+        cbCnts1.setToolTipText("<html>Select the second connection the virtual machine <br>"
+                + "will have if there is a second connection.</html>");
+        cbCnts2 = new JComboBox(hubNameList.toArray());
+        cbCnts2.setSelectedIndex(0);
+        cbCnts2.setToolTipText("<html>Select the first connection that the virtual machine <br> "
+                + "will have.</html>");
+        cbCnts3 = new JComboBox(hubNameList.toArray());
+        cbCnts3.setSelectedIndex(0);
+        cbCnts3.setToolTipText("<html>Select the first connection that the virtual machine <br> "
+                + "will have.</html>");
+
+        //The combo boxes to select from the above strings of
+        //Operating system, Version and connections
+        cbOS = new JComboBox(strOS);
+        cbOS.setSelectedIndex(0);
+        cbOS.addActionListener(this);
+        cbOS.setToolTipText("<html>Select the corresponding Operating system the <br> "
+                + "virtual machine will have.</html>");
+        cbVer = new JComboBox();
+        cbVer.setEnabled(false);
+        cbVer.setToolTipText("<html>Select the corresponding version of the <br> "
+                + "Operating system on the virtual machine.</html>");
+        
+        vMs = new ImageIcon("pics/newvm.jpg");
+        hubs = new ImageIcon("pics/newhub.jpg");
+
+         //All the buttons needed to make the program work properly
+        vM = new JButton("Add Virtual Machine", vMs);
+        vM.setVerticalTextPosition(SwingConstants.TOP);
+        vM.setHorizontalTextPosition(SwingConstants.CENTER);
+        vM.setToolTipText("<html>By pressing this button you will create a JLabel with all the"
+                + "<br> information you provided on the right into the middle"
+                + "<br> of the program.</html>");
+        //vM.setPreferredSize(new Dimension(180,180));
+        vM.setBounds(0, 140, 180, 180);
+        vM.addActionListener(this);
+
+        hub = new JButton("Add Hub", hubs);
+        hub.setVerticalTextPosition(SwingConstants.TOP);
+        hub.setHorizontalTextPosition(SwingConstants.CENTER);
+        hub.setToolTipText("<html>By pressing this button you will create a JLabel with all the"
+                + "<br> information you provided on the right into the middle"
+                + "<br> of the program.</html>");
+        //hub.setPreferredSize(new Dimension(180,180));
+        hub.setBounds(0, 0, 180, 180);
+        hub.addActionListener(this);
+
+        exit = new JButton("Exit");
+        exit.setToolTipText("<html>Exit the program</html>");
+        exit.addActionListener(this);
+
+
+        saveFile = new JButton("Save Configuration File");
+        saveFile.setToolTipText("<html>This will allow you to export the file <br>"
+                + " as a text file to a location on your computer for use in <br>"
+                + "V-NetLab.</html>");
+        saveFile.addActionListener(this);
+
+        loadFile = new JButton ("Load Configuration File");
+        loadFile.setToolTipText("<html>You can load a previously saved config file <br>"
+                + "from your computer for later use.</html>");
+        loadFile.addActionListener(this);
+
+        helpButt = new JButton("Help");
+        helpButt.setToolTipText("");
+        helpButt.addActionListener(this);
+
+        //Deletes the network topology that was already draw by the user if
+        //they feel the need to start all over again.
+        delt = new JButton("Delete Network");
+        delt.setToolTipText("<html>Delete's the entire area where you were <br>"
+                + "creating the network topology and can start fresh.</html>");
+        delt.addActionListener(this);
+
+        //the button that allows the user to search for the file
+        //location of the source file for their Operating Systems
+        //ISO image
+        brows = new JButton("Browse...");
+        brows.addActionListener(this);
+        brows.setToolTipText("<html>Browse your computer for the location of the <br>"
+                + "ISO image that your virtual machine will have.</html>");
+
+        //the reset button that when clicked replaces all information
+        //put into the fields back to default
+        rst = new JButton("Reset");
+        rst.addActionListener(this);
+        rst.setToolTipText("<html>This will reset all the information that you entered <br>"
+                + "for this virtual machine back to the default selections.</html>");
+
+        //saves the vm information to an array to be able to grabbed easier
+        savVm = new JButton("Save VM");
+        savVm.addActionListener(this);
+        savVm.setToolTipText("<html>This save the information provided by you to an array <br> "
+                + "so that it can be later grabbed and displayed into the configuration file.</html>");
+
+        //deletes the selected virtual machine from the canvas
+        delVm = new JButton("Delete VM");
+        delVm.addActionListener(this);
+        delVm.setToolTipText("<html>This will delete the selected Virtual Machine from the canvas.</html>");
+
+        //the reset button that when clicked replaces all information
+        //put into the fields back to default
+        rstHub = new JButton("Reset");
+        rstHub.addActionListener(this);
+        rstHub.setToolTipText("<html>This will reset all the information that you entered <br>"
+                + "for this virtual machine back to the default selections.</html>");
+
+        //saves the Hub information to an array to be able to grabbed easier
+        savHub = new JButton("Save Hub");
+        savHub.addActionListener(this);
+        savHub.setToolTipText("<html>This save the information provided by you to an array <br> "
+                + "so that it can be later grabbed and displayed into the configuration file.</html>");
+
+        //deletes the selected Hub from the canvas
+        delHub = new JButton("Delete Hub");
+        delHub.addActionListener(this);
+        delHub.setToolTipText("<html>This will delete the selected Virtual Machine from the canvas.</html>");
+
+        //First panel that has the VM and Hub buttons to add them
+        //to the area that will connect them together
+        p1 = new JPanel();
+        p1.setLayout(new GridLayout(0,1));
+        p1.setPreferredSize(new Dimension(240,650));
+        p1.add(innerpane1 = new JPanel());
+        innerpane1.setPreferredSize(new Dimension(140,325));
+        innerpane1.add(vM);
+        innerpane1.add(hub);
+        p1.add(innerpane2 = new JPanel());
+        innerpane2.setLayout(new GridLayout(0,1));
+        innerpane2.setPreferredSize(new Dimension(100,325));
+        innerpane2.add(emp1);
+        innerpane2.add(emp2);
+        innerpane2.add(emp3);
+        innerpane2.add(vmHostName);
+        innerpane2.add(emp4);
+
+        //Area to where the user can see the VMs and hub connections
+        //and also what the configuration file will look like
+        cFile = new JTextArea();
+        JScrollPane scrollPane1 = new JScrollPane(cFile);
+        scrollPane1.setPreferredSize(new Dimension(700,650));
+        scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        netTopol = new JPanel();
+        netTopol.setLayout(new BoxLayout(netTopol, BoxLayout.PAGE_AXIS));
+        JScrollPane scrollPane2 = new JScrollPane(netTopol);
+        scrollPane2.setPreferredSize(new Dimension(700,650));
+        scrollPane2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        panelHolder = new JTabbedPane();
+        panelHolder.setVisible(true);
+        panelHolder.setPreferredSize(new Dimension(700,650));
+        panelHolder.addTab("View Netowrk Topology", scrollPane2);
+        panelHolder.addTab("View Configuration File", scrollPane1);
+
+        //panel that holds the browse button in the panel on the right
+        //without any contraints making it easier to look out from the 
+        //rest and look like an actual browse button
+        JPanel browsPan = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        browsPan.add(brows);
+        JPanel rstPan = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        rstPan.add(savVm);
+        rstPan.add(rst);
+        rstPan.add(delVm);
+
+        JPanel rstHubPan = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        rstHubPan.add(savHub);
+        rstHubPan.add(rstHub);
+        rstHubPan.add(delHub);
+
+
+        //Location of the Name, OS, Ver, Src and Connections to be
+        //easily selected by the user without any problems.
+        p3 = new JPanel();
+        p3.setVisible(true);
+        p3.setPreferredSize(new Dimension(300,650));
+
+        vmPan = new JPanel();
+        vmPan.setVisible(false);
+        vmPan.setLayout(new GridLayout(0,1));
+        vmPan.setPreferredSize(new Dimension(300,650));
+        vmPan.add(vmNam);
+        vmPan.add(name);
+        vmPan.add(tfName);
+        vmPan.add(os);
+        vmPan.add(cbOS);
+        vmPan.add(ver);
+        vmPan.add(cbVer);
+        vmPan.add(src);
+        vmPan.add(tfSrc);
+        vmPan.add(browsPan);
+        vmPan.add(cnt0);
+        vmPan.add(cbCnts0);
+        vmPan.add(tfCnts0);
+        vmPan.add(cnt1);
+        vmPan.add(cbCnts1);
+        vmPan.add(tfCnts1);
+        vmPan.add(cnt2);
+        vmPan.add(cbCnts2);
+        vmPan.add(tfCnts2);
+        vmPan.add(cnt3);
+        vmPan.add(cbCnts3);
+        vmPan.add(tfCnts3);
+        vmPan.add(Box.createRigidArea(new Dimension(10,0)));
+        vmPan.add(rstPan);
+
+        hubPane = new JPanel();
+        hubPane.setVisible(false);
+        hubPane.setLayout(new GridLayout(0,1));
+        hubPane.setPreferredSize(new Dimension(300,650));
+        hubPane.add(hubNam);
+        hubPane.add(vsn);
+        hubPane.add(vmSwitchName);
+        hubPane.add(name2);
+        hubPane.add(tfName1);
+        hubPane.add(subnet);
+        hubPane.add(tfSubnet);
+        hubPane.add(netmask);
+        hubPane.add(tfNetmask);
+        hubPane.add(inf);
+        //hubPane.add(listInf);
+        hubPane.add(Box.createRigidArea(new Dimension(10,0)));
+        hubPane.add(rstHubPan);
+
+        //panel to export the config file, load the config file
+        // and to also delete the panel where the connections
+        // are made
+        p4 = new JPanel();
+        p4.setLayout(new BoxLayout(p4, BoxLayout.LINE_AXIS));
+        p4.setPreferredSize(new Dimension(1200,50));
+        p4.add(Box.createRigidArea(new Dimension(0,0)));
+        p4.add(saveFile);
+        p4.add(Box.createRigidArea(new Dimension(10,0)));
+        p4.add(loadFile);
+        p4.add(Box.createRigidArea(new Dimension(150,0)));
+        p4.add(delt);
+        p4.add(Box.createRigidArea(new Dimension(150,0)));
+        p4.add(helpButt);
+        p4.add(Box.createHorizontalGlue());
+        p4.add(Box.createRigidArea(new Dimension(10,0)));
+        p4.add(exit);
+
+        //adds all the panel to the complete frame
+        add(p1, BorderLayout.LINE_START);
+        add(panelHolder, BorderLayout.PAGE_START);
+        add(vmPan, BorderLayout.LINE_END);
+        add(hubPane, BorderLayout.LINE_END);
+        add(p3, BorderLayout.LINE_END);
+        add(p4, BorderLayout.PAGE_END);
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+        if(e.getSource() == vM)
+        {
+            canvasVM = new JButton(vMs);
+            canvasVM.setName(String.valueOf(canvasVMIndex));
+            netTopolList.add("VM" + String.valueOf(canvasVMIndex));
+            canvasVMIndex++;
+            canvasVM.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    onMousePressed(e);
+                }
+            });
+            canvasVMList.add(canvasVM);
+            netTopol.add(canvasVM);
+            netTopol.revalidate();
+            netTopol.repaint();
+            AddNewVM(vmList, hubList, canvasVMList, canvasHubList);
+        }
+        else if(e.getSource() == savVm)
+        {
+            SaveVM(vmList, hubList, canvasVMList, canvasHubList);
+            UpdateVMNames(vmList, hubList, canvasVMList, canvasHubList);
+            MakeConnection(vmList, hubList, canvasVMList, canvasHubList);
+        }
+        else if (e.getSource() == hub)
+        {
+            canvasHub = new JButton(hubs);
+            canvasHub.setName(String.valueOf(canvasHubIndex));
+            netTopolList.add("Hub" + String.valueOf(canvasHubIndex));
+            canvasHubIndex++;
+            canvasHub.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    onMousePressed(e);
+                }
+            });
+            canvasHubList.add(canvasHub);
+            netTopol.add(canvasHub);
+            netTopol.revalidate();
+            netTopol.repaint();
+            AddNewHub(vmList, hubList, canvasVMList, canvasHubList);
+        }
+        else if(e.getSource() == savHub)
+        {
+            SaveHub(vmList, hubList, canvasVMList, canvasHubList);
+        }
+        else if (e.getSource() == exit)
+        {
+            frame.dispose();
+        } 
+        else if (e.getSource() == brows)
+        {
+            int returnVal = fc.showOpenDialog(GroupOneGUI.this);
+                       
+            if(returnVal == JFileChooser.APPROVE_OPTION)
             {
-                VM currentVM = (VM)vmList.get(i);
-                System.out.print(currentVM.getVMname() + ", ");
+                File file = fc.getSelectedFile();
+                tfSrc.setText(file.getAbsolutePath());
+            }
+        } 
+        else if (e.getSource() == delt)
+        {
+            Object[] options = {"Yes", "No"};
+            int choice = JOptionPane.showOptionDialog(frame,
+            "Are you sure you would like to delete the ENTIRE NETWORK? This cannot be undone.",
+            "Delete Network",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.ERROR_MESSAGE,
+            null, options, options[0]);
+            
+            if(choice == JOptionPane.YES_OPTION)
+            {
+                netTopolList.clear();
+                netTopol.removeAll();
+                vmPan.setVisible(false);
+                p3.setVisible(true);
+                hubPane.setVisible(false);
+                netTopol.revalidate();
+                netTopol.repaint();
+                
+                // Set all VM buttons to NULL so they are removed from memory
+                for(int i = 0; i < canvasVMList.size(); i++)
+                {
+                    canvasVMList.set(i, null);
+                }    
+                canvasVMList.clear();
+                
+                // Set all Hub buttons to NULL so they are removed from memory
+                for(int i = 0; i < canvasHubList.size(); i++)
+                {
+                    canvasHubList.set(i, null);
+                }    
+                canvasHubList.clear();
+                
+                DeleteNetwork(vmList, hubList, canvasVMList, canvasHubList);
+            }
+        } 
+        else if (e.getSource() == rst)
+        {
+            tfName.setText("");
+            tfSrc.setText("");
+            cbOS.setSelectedIndex(0);
+            cbVer.setSelectedIndex(0);
+            cbCnts0.setSelectedIndex(0);
+            cbCnts1.setSelectedIndex(0);
+            cbCnts2.setSelectedIndex(0);
+            cbCnts3.setSelectedIndex(0);
+            tfCnts0.setText("");
+            tfCnts1.setText("");
+            tfCnts2.setText("");
+            tfCnts3.setText("");
+        } 
+        else if (e.getSource() == loadFile) 
+        {
+            BufferedReader br = null;
+ 
+		try 
+                {
+                    int returnVal = fc.showOpenDialog(GroupOneGUI.this);
+            
+                    if (returnVal == JFileChooser.APPROVE_OPTION) 
+                    {
+                        String sCurrentLine;
+                        File file = fc.getSelectedFile();
+			br = new BufferedReader(new FileReader(file.getAbsoluteFile()));
+ 
+			while ((sCurrentLine = br.readLine()) != null) 
+                        {
+                            cFile.append("\n" + sCurrentLine);
+			}
+                    } 
+ 
+		} catch (IOException er) {
+			er.printStackTrace();
+		} finally {
+			try {
+				if (br != null)br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+        } 
+        else if (e.getSource() == saveFile) 
+        {
+            try
+            {
+                SaveConfigFile(vmList, hubList, canvasVMList, canvasHubList);
+            }
+            catch (IOException ex)
+            {
+                Logger.getLogger(GroupOneGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        else if (e.getSource() == rstHub)
+        {
+            tfName1.setText("");
+            tfSubnet.setText("");
+            tfNetmask.setText("");
+        }
+        else if(e.getSource() == delHub)
+        {
+            int HubIndexcheck = hubIndex;
+            String checkHub = "";
+            int removeDevice = -1;
+            
+            for(int i = 0; i < netTopolList.size(); i++)
+            {
+                checkHub = (String)netTopolList.get(i);
+                if(checkHub.contains("Hub"))
+                {
+                    HubIndexcheck--;
+                }
+                if(HubIndexcheck == -1)
+                {
+                    i = netTopolList.size();
+                }
+                removeDevice++;
             }
             
-            // Print out current Hubs in the hubList.
-            System.out.print("\nCurrent Hubs: ");
-            for(int i = 0; i < hubList.size(); i++)
-            {
-                Hub currentHub = (Hub)hubList.get(i);
-                System.out.print(currentHub.getHubName() + ", ");
-            }
-                        
-            System.out.print("\n\n");
-            userChoice = input.nextLine();
+            netTopol.remove(removeDevice);
+            canvasHubList.set(hubIndex, null);
+            canvasHubList.remove(hubIndex);
+            vmPan.setVisible(false);
+            p3.setVisible(true);
+            hubPane.setVisible(false);
+            netTopol.revalidate();
+            netTopol.repaint();
+            DeleteHub(vmList, hubList, canvasVMList, canvasHubList);
 
-            // Takes in user's choice and runs the following function.
-            switch(userChoice)
+        }
+        else if(e.getSource() == delVm)
+        {
+            int VMIndexcheck = vmIndex;
+            String checkVM = "";
+            int removeDevice = -1;
+            
+            for(int i = 0; i < netTopolList.size(); i++)
             {
-                default: System.out.print("Incorrect Response. Please Try Again. \n");
-                    break;
-                case "1":
-                    AddNewVM(vmList, hubList, vmIndex, hubIndex);
-                    break;
-                case "2":
-                    AddNewHub(vmList, hubList, vmIndex, hubIndex);
-                    break;
-                case "3":
-                    ViewDevice(vmList, hubList, vmIndex, hubIndex);
-                    break;
-                case "4":
-                    EditDevice(vmList, hubList, vmIndex, hubIndex);
-                    break;
-                case "5":
-                    DeleteDevice(vmList, hubList, vmIndex, hubIndex);
-                    break;
-                case "6":
-                    ConnectDevices(vmList, hubList, vmIndex, hubIndex);
-                    break;
-                case "7":
-                    SaveConfigFile(vmList, hubList, vmIndex, hubIndex);
-                    break;
-                case "8":
-                    //LoadConfigFile(vmList, hubList, vmIndex, hubIndex);
-                    break;
-                case "9":
-                    DeleteNetwork(vmList, hubList, vmIndex, hubIndex);
-                    break;
-                case "10":
-                    exitProgram = true;
-                    break;
+                checkVM = (String)netTopolList.get(i);
+                if(checkVM.contains("VM"))
+                {
+                    VMIndexcheck--;
+                }
+                if(VMIndexcheck == -1)
+                {
+                    i = netTopolList.size();
+                }
+                removeDevice++;
             }
+            
+            netTopol.remove(removeDevice);
+            canvasVMList.set(vmIndex, null);
+            canvasVMList.remove(vmIndex);
+            vmPan.setVisible(false);
+            p3.setVisible(true);
+            hubPane.setVisible(false);
+            netTopol.revalidate();
+            netTopol.repaint();
+            DeleteVM(vmList, hubList, canvasVMList, canvasHubList);
+        }
+        else if(e.getSource() == cbOS)
+        {
+            UpdateOSComboBoxes(vmList, hubList, canvasVMList, canvasHubList);
+        }
+        else if(e.getSource() == helpButt)
+        {
+            Object[] options = {"OK"};
+            int n = JOptionPane.showOptionDialog(frame,
+            "<html>To add a virtual machine to the canvas click Add Virtual Machine. <br> <br>" + 
+                    
+            "To add a hub to the canvas click Add Hub. <br> <br>" + 
+
+            "To update the Name, OS, Version, and Source for a virtual machine, <br>" + 
+            "first click on the picture of the virtual machine you wish to edit. <br>" + 
+            "This will display text and dropdown boxes on the right-hand side of the screen. <br>" + 
+            "Click in the Name box to edit the Virtual Machine's name. Each name can <br>" + 
+            "only be used once. To select an OS, click inside the dropdown OS box and select one. <br>" + 
+            "To select a Version of the OS, click in the Version box and select. <br>" + 
+            "To select a source to which you can save a file, click Browse and select a location <br>" + 
+            "on your machine. <br> <br>" +
+                    
+            "To update the Name, Subnet, and Netmask of a hub, first click on the picture <br>" + 
+            "of the hub you wish to edit. This will display text boxes on the right-hand side of the screen. <br>" + 
+            "Click in the Name box to edit the Hub's name. Each name can only be used once. <br>" + 
+            "To set the Subnet, click in the Subnet box and type in a new subnet. <br>" + 
+            "To set the Netmask, click in the Netmask box and type a new Netmask. <br> <br>" + 
+
+            "To make a connection from a VM to hub, select a particular VM, then on the right-hand side <br>" +
+            "in the VM configuration editor, choose a connection dropdown to select an available hub. <br> <br>" +
+
+            "To save a configuration file, click the Save Configuration File button in the bottom left corner. <br> <br>" +
+
+            "To load a configuration file, click the Load Configuration File button in the bottom left corner. <br> <br>" +
+
+            "To delete an entire network, click the Delete Network button at the bottom of the screen. <br> <br>" +
+
+            "To read Help text, click the Help button at the bottom screen <br>" +
+            "(you have apparently already done this) <br> <br>" +
+
+            "To exit the program completely, click on the Exit button in the bottom right corner. <br>",
+            "Help",
+            JOptionPane.PLAIN_MESSAGE,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]);
+
+
         }
     }
     
-    public static void AddNewVM(List vmList, List hubList, int vmIndex, int hubIndex)
+    public void onMousePressed(MouseEvent e)
     {
-        // Variable Declaration
-        Scanner input = new Scanner(System.in );
-        String userInput;
-        Boolean duplicateVMname = true;
-        Boolean duplicateHubName = true;
-        VM newVM = new VM();
-        VM currentVM = new VM();
+        for(int i = 0; i < canvasVMList.size(); i++)
+        {
+            if(e.getSource() == canvasVMList.get(i))
+            {
+                vmPan.setVisible(true);
+                p3.setVisible(false);
+                hubPane.setVisible(false);
+                
+                UpdateHubComboBoxes(vmList, hubList, canvasVMList, canvasHubList);
+                
+                VM currentVM = new VM();
+                currentVM = (VM)vmList.get(i);
+                
+                java.util.List hubNameList = new ArrayList();
+                for(int k = 0; k < hubList.size(); k++)
+                {
+                    Hub currentHub = (Hub)hubList.get(k);
+                    hubNameList.add(currentHub.getHubName());
+                }
+                
+                tfName.setText(currentVM.getVMname());
+                cbOS.setSelectedIndex(currentVM.getVMos());
+                UpdateOSComboBoxes(vmList, hubList, canvasVMList, canvasHubList);
+                cbVer.setSelectedIndex(currentVM.getVMversion());
+                tfSrc.setText(currentVM.getVMsource());
+                
+                cbCnts0.setSelectedIndex(currentVM.getVMconnect0());
+                cbCnts1.setSelectedIndex(currentVM.getVMconnect1());
+                cbCnts2.setSelectedIndex(currentVM.getVMconnect2());
+                cbCnts3.setSelectedIndex(currentVM.getVMconnect3());
+                
+                previousHub0 = currentVM.getVMconnect0();
+                previousHub1 = currentVM.getVMconnect1();
+                previousHub2 = currentVM.getVMconnect2();
+                previousHub3 = currentVM.getVMconnect3();
+                
+                tfCnts0.setText(currentVM.getVMeth0());
+                tfCnts1.setText(currentVM.getVMeth1());
+                tfCnts2.setText(currentVM.getVMeth2());
+                tfCnts3.setText(currentVM.getVMeth3());
+                
+                vmIndex = i;
+            }
+        }
+        
+        for(int j = 0; j < canvasHubList.size(); j++)
+        {
+            if(e.getSource() == canvasHubList.get(j))
+            {
+                vmPan.setVisible(false);
+                p3.setVisible(false);
+                hubPane.setVisible(true);
+                
+                Hub currentHub = new Hub();
+                currentHub = (Hub)hubList.get(j);
+                
+                vmSwitchName.setText(currentHub.getHubVirtualSwitchName());
+                tfName1.setText(currentHub.getHubName());
+                tfSubnet.setText(currentHub.getHubSubnet());
+                tfNetmask.setText(currentHub.getHubNetmask());
+                //listInf = new JList(currentHub.getHubINFlist().toArray());
+                
+                hubIndex = j;
+            }
+        }
+        
+        for(int i = 0; i < hubList.size(); i++)
+        {
+            Hub currentHub = (Hub)hubList.get(i);
+            System.out.print("\nHub INF for " + currentHub.getHubName() + ": " + currentHub.getHubINF());
+        }
+    }
+    
+    public static void createAndShowGUI()
+    {
+        frame = new JFrame("V-NET Lab GUI Configurator");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(new GroupOneGUI());
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setBounds(0,0,screenSize.width, screenSize.height);
+        frame.setVisible(true);
+    }
+    
+    public static void UpdateHubComboBoxes(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
+    {
+        java.util.List hubNameList = new ArrayList();
         Hub currentHub = new Hub();
         
-        if(vmList.isEmpty())
+        hubNameList.add("");
+        for(int i = 0; i < hubList.size(); i++)
         {
-            duplicateVMname = false;
+            currentHub = (Hub)hubList.get(i);
+            hubNameList.add(currentHub.getHubName());
         }
         
-        if(hubList.isEmpty())
-        {
-            duplicateHubName = false;
-        }
+        //cbCnts0.removeAll();
+        //cbCnts1.removeAll();
+        //cbCnts2.removeAll();
+        //cbCnts3.removeAll();
         
+        cbCnts0.removeAllItems();
+        cbCnts1.removeAllItems();
+        cbCnts2.removeAllItems();
+        cbCnts3.removeAllItems();
+        
+        cbCnts0.addItem(hubNameList.get(0));
+        cbCnts1.addItem(hubNameList.get(0));
+        cbCnts2.addItem(hubNameList.get(0));
+        cbCnts3.addItem(hubNameList.get(0));
+        
+        for(int i = 1; i < hubNameList.size(); i++)
+        {
+            cbCnts0.addItem(hubNameList.get(i));
+            cbCnts1.addItem(hubNameList.get(i));
+            cbCnts2.addItem(hubNameList.get(i));
+            cbCnts3.addItem(hubNameList.get(i));
+        }
+    }
+    
+    public static void UpdateOSComboBoxes(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
+    {
+        int selectedOS = cbOS.getSelectedIndex();
+        
+        if(selectedOS == 0)
+        {
+            cbVer.setEnabled(false);
+            //cbVer.removeAll();
+            cbVer.removeAllItems();
+            cbVer.addItem("");
+        }
+        else if(selectedOS == 1)
+        {
+            cbVer.setEnabled(true);
+            //cbVer.removeAll();
+            cbVer.removeAllItems();
+            cbVer.addItem("");
+            cbVer.addItem("10");
+            cbVer.addItem("8");
+            cbVer.addItem("7");
+            cbVer.addItem("Vista");
+            cbVer.addItem("XP");
+        }
+        else if(selectedOS == 2)
+        {
+            cbVer.setEnabled(true);
+            //cbVer.removeAll();
+            cbVer.removeAllItems();
+            cbVer.addItem("");
+            cbVer.addItem("Mint");
+            cbVer.addItem("Ubuntu");
+            cbVer.addItem("Debian");
+            cbVer.addItem("Fedora");
+            cbVer.addItem("CentOS");
+        }
+        else if(selectedOS == 3)
+        {
+            cbVer.setEnabled(true);
+            //cbVer.removeAll();
+            cbVer.removeAllItems();
+            cbVer.addItem("");
+            cbVer.addItem("Yosemite");
+            cbVer.addItem("Mavericks");
+            cbVer.addItem("Mountain Lion");
+            cbVer.addItem("Lion");
+            cbVer.addItem("Snow Leopard");
+        }
+    }
+    
+    public static void AddNewVM(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
+    {
         // Add the newly created VM to the VM List.
+        VM newVM = new VM();
         vmList.add(newVM);
-        
-        // Get the size of vmList and apply it to vmIndex.
-        vmIndex = vmList.size() - 1;
-        
-        System.out.print("\nPlease enter the name of the new VM: ");
-        userInput = input.nextLine();
-        
-        // Checks to see if the requested name already exists in vmList or hubList.
-        // If it does, keep asking until receiving a new, unique name.
-        while(duplicateVMname == true || duplicateHubName == true)
-        {
-            // Check to see if the requested name exists as a VM.
-            for(int i = 0; i < vmList.size(); i++)
-            {
-                currentVM = (VM)vmList.get(i);
-                
-                if(userInput.equals(currentVM.getVMname()))
-                {
-                    duplicateVMname = true;
-                    i = vmList.size() + 1;
-                }
-                else
-                {
-                    duplicateVMname = false;
-                }
-            }
-            // Check to see if the requested name exists as a Hub.
-            for(int i = 0; i < hubList.size(); i++)
-            {
-                currentHub = (Hub)hubList.get(i);
-                
-                if(userInput.equals(currentHub.getHubName()))
-                {
-                    duplicateHubName = true;
-                    i = hubList.size() + 1;
-                }
-                else
-                {
-                    duplicateHubName = false;
-                }
-            }
-            if(duplicateVMname == true || duplicateHubName == true)
-            {
-                System.out.print("The device, " + userInput + " already exists as a VM or a Hub.");
-                System.out.print("\n\nPlease enter a UNIQUE name for the new VM: ");
-                userInput = input.nextLine();
-            }           
-        }
-        
-        // Add the name of the new VM object to the list.
-        currentVM.setVMname(userInput);
-                
-        // Takes in the desired OS the user would like for the VM.
-        System.out.print("Please enter an OS for the VM: ");
-        userInput = input.nextLine();
-        currentVM.setVMos(userInput);
-        
-        // Takes in the desired OS Version the user would like for the VM.
-        System.out.print("Please enter a version for the VM: ");
-        userInput = input.nextLine();
-        currentVM.setVMversion(userInput);
-        
-        // Takes in the desired file source the user would like for the VM.
-        System.out.print("Please enter a file path for the VM: ");
-        userInput = input.nextLine();
-        currentVM.setVMsource(userInput);
-        
-        // Take all changes that were applied to currentVM and copy them to newVM.
-        // Add newVM to the VM List
-        newVM = currentVM;
-        vmList.set(vmIndex, newVM);
-        
-        // Show the user the results of the entered VM.
-        ViewVM(vmList, hubList, vmIndex, hubIndex);
     }
     
-    public static void AddNewHub(List vmList, List hubList, int vmIndex, int hubIndex)
+    public static void AddNewHub(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
     {
-        // Variable Declaration
-        Scanner input = new Scanner(System.in );
-        String userInput;
-        Boolean duplicateHubName = true;
-        Boolean duplicateVMname = true;
-        Hub newHub = new Hub();
-        Hub currentHub = new Hub();
-        VM currentVM = new VM();
-        
-        if(hubList.isEmpty())
-        {
-            duplicateVMname = false;
-        }
-        
-        if(vmList.isEmpty())
-        {
-            duplicateHubName = false;
-        }
-        
         // Add the newly created Hub to the Hub List.
+        Hub newHub = new Hub();
         hubList.add(newHub);
-        
-        // Get the size of hubList and apply it to hubIndex.
-        hubIndex = hubList.size() - 1;
-        
-        System.out.print("\nPlease enter the name of the new Hub: ");
-        userInput = input.nextLine();
-        
-        // Checks to see if the requested name already exists in hubList.
-        // If it does, keep asking until receiving a new, unique name.
-        while(duplicateHubName == true || duplicateVMname == true)
-        {
-            // Checks to see if the requested name exists as a Hub.
-            for(int i = 0; i < hubList.size(); i++)
-            {
-                currentHub = (Hub)hubList.get(i);
-                
-                if(userInput.equals(currentHub.getHubName()))
-                {
-                    duplicateHubName = true;
-                    i = hubList.size() + 1;
-                }
-                else
-                {
-                    duplicateHubName = false;
-                }
-            }
-            // Checks to see if the requested name exists as a VM.
-            for(int i = 0; i < vmList.size(); i++)
-            {
-                currentVM = (VM)vmList.get(i);
-                
-                if(userInput.equals(currentVM.getVMname()))
-                {
-                    duplicateVMname = true;
-                    i = vmList.size() + 1;
-                }
-                else
-                {
-                    duplicateVMname = false;
-                }
-            }
-            if(duplicateVMname == true || duplicateHubName == true)
-            {
-                System.out.print("The device, " + userInput + " already exists as a VM or a Hub.");
-                System.out.print("\n\nPlease enter a UNIQUE name for the new Hub: ");
-                userInput = input.nextLine();
-            }
-        }
-        
-        // Add the name of the new VM object to the list.
-        currentHub.setHubName(userInput);
-                
-        // Takes in the desired Subnet the user would like for the Hub.
-        System.out.print("Please enter a Subnet for Hub: ");
-        userInput = input.nextLine();
-        currentHub.setHubSubnet(userInput);
-        
-        // Takes in the desired Netmask the user would like for the Hub.
-        System.out.print("Please enter a NetMask for Hub: ");
-        userInput = input.nextLine();
-        currentHub.setHubNetmask(userInput);
-        
-        // Take all changes that were applied to currentVM and copy them to newVM.
-        // Add newVM to the VM List
-        newHub = currentHub;
-        hubList.set(hubIndex, newHub);
-        
-        // Show the user the results of the entered VM.
-        ViewHub(vmList, hubList, vmIndex, hubIndex);
     }
     
-    public static void ViewDevice(List vmList, List hubList, int vmIndex, int hubIndex)
-    {
-        Scanner input = new Scanner(System.in );
-        String userInput;
-        Boolean vmExists = true;
-        Boolean hubExists = true;
-
-        System.out.print("\nWhat is the EXACT name of the device you would like to view?: ");
-        userInput = input.nextLine();
-        
-        // Checks to see if the requested device exists in vmList or hubList.
-        // If it does, run the method that corresponds to that device, which returns all values of that device.
-        if(vmList.isEmpty())
-        {
-            vmExists = false;
-        }
-        else
-        {
-            for(int i = 0; i < vmList.size(); i++)
-            {
-                VM currentVM = (VM)vmList.get(i);
-            
-                if(userInput.equals(currentVM.getVMname()))
-                {
-                    vmIndex = i;
-                    vmExists = true;
-                    i = vmList.size() + 1;
-                    ViewVM(vmList, hubList, vmIndex, hubIndex);
-                }
-                else
-                {
-                    vmExists = false;
-                }
-            }
-        }
-                
-        if(hubList.isEmpty())
-        {
-            hubExists = false;
-        }
-        else
-        {
-            for(int i = 0; i < hubList.size(); i++)
-            {
-                Hub currentHub = (Hub)hubList.get(i);
-            
-                if(userInput.equals(currentHub.getHubName()))
-                {
-                    hubIndex = i;
-                    hubExists = true;
-                    i = hubList.size() + 1;
-                    ViewHub(vmList, hubList, vmIndex, hubIndex);
-                }
-                else
-                {
-                    hubExists = false;
-                }
-            }
-        }
-                
-        if(vmExists == false && hubExists == false)
-        {
-            System.out.print("\nThe device, " + userInput + ", does not exist or has not yet been entered into the program.");
-        }
-    }
-    
-    public static void ViewVM(List vmList, List hubList, int vmIndex, int hubIndex)
-    {
-        VM currentVM = (VM)vmList.get(vmIndex);
-        
-        System.out.print("\nVM Name: " + currentVM.getVMname());
-        System.out.print("\nVM OS: " + currentVM.getVMos());
-        System.out.print("\nVM Version: " + currentVM.getVMversion());
-        System.out.print("\nVM Source: " + currentVM.getVMsource());
-        System.out.print("\nConnection 0: " + currentVM.getVMconnect0());
-        System.out.print("\neth0: " + currentVM.getVMeth0());
-        System.out.print("\nConnection 1: " + currentVM.getVMconnect1());
-        System.out.print("\neth1: " + currentVM.getVMeth1());
-        System.out.print("\nConnection 2: " + currentVM.getVMconnect2());
-        System.out.print("\neth2: " + currentVM.getVMeth2());
-        System.out.print("\nConnection 3: " + currentVM.getVMconnect3());
-        System.out.print("\neth3: " + currentVM.getVMeth3());
-    }
-    
-    public static void ViewHub(List vmList, List hubList, int vmIndex, int hubIndex)
-    {
-        Hub currentHub = (Hub)hubList.get(hubIndex);
-        
-        System.out.print("\nHub Name: " + currentHub.getHubName());
-        System.out.print("\nHub Subnet: " + currentHub.getHubSubnet());
-        System.out.print("\nHub Netmask: " + currentHub.getHubNetmask());
-    }
-    
-    public static void EditDevice(List vmList, List hubList, int vmIndex, int hubIndex)
-    {
-        Scanner input = new Scanner(System.in );
-        String userInput;
-        Boolean vmExists = true;
-        Boolean hubExists = true;
-
-        System.out.print("\nWhat is the EXACT name of the device you would like to edit?: ");
-        userInput = input.nextLine();
-        
-        // Checks to see if the requested device exists in vmList or hubList.
-        // If it does, run the method that corresponds to that device, which returns all values of that device.
-        if(vmList.isEmpty())
-        {
-            vmExists = false;
-        }
-        else
-        {
-            for(int i = 0; i < vmList.size(); i++)
-            {
-                VM currentVM = (VM)vmList.get(i);
-            
-                if(userInput.equals(currentVM.getVMname()))
-                {
-                    vmIndex = i;
-                    vmExists = true;
-                    i = vmList.size() + 1;
-                    EditVM(vmList, hubList, vmIndex, hubIndex);
-                }
-                else
-                {
-                    vmExists = false;
-                }
-            }
-        }
-                
-        if(hubList.isEmpty())
-        {
-            hubExists = false;
-        }
-        else
-        {
-            for(int i = 0; i < hubList.size(); i++)
-            {
-                Hub currentHub = (Hub)hubList.get(i);
-            
-                if(userInput.equals(currentHub.getHubName()))
-                {
-                    hubIndex = i;
-                    hubExists = true;
-                    i = hubList.size() + 1;
-                    EditHub(vmList, hubList, vmIndex, hubIndex);
-                }
-                else
-                {
-                    hubExists = false;
-                }
-            }
-        }
-                
-        if(vmExists == false && hubExists == false)
-        {
-            System.out.print("\nThe device, " + userInput + ", does not exist or has not yet been entered into the program.");
-        }
-    }
-    
-    public static void EditVM(List vmList, List hubList, int vmIndex, int hubIndex)
+    public static void SaveVM(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
     {
         // Variable Declaration
-        Scanner input = new Scanner(System.in );
-        String userInput;
         Boolean duplicateVMname = true;
         Boolean duplicateHubName = true;
+        Boolean containsInvalidCharacters = true;
         VM editVM = (VM)vmList.get(vmIndex);
         VM currentVM = new VM();
         Hub currentHub = new Hub();
-        
-        if(vmList.isEmpty())
-        {
-            duplicateVMname = false;
-        }
-        
-        if(hubList.isEmpty())
-        {
-            duplicateHubName = false;
-        }
-        
-        // Resets the name of the chosen VM
-        editVM.setVMname("");
-        
-        System.out.print("Please enter the name of the new VM: ");
-        userInput = input.nextLine();
-        
+        String userChoice = tfName.getText();
+                
         // Checks to see if the requested name already exists in vmList or hubList.
         // If it does, keep asking until receiving a new, unique name.
-        while(duplicateVMname == true || duplicateHubName == true)
+        while(duplicateVMname == true || duplicateHubName == true || containsInvalidCharacters == true)
         {
-            // Check to see if the requested name exists as a VM.
-            for(int i = 0; i < vmList.size(); i++)
+            // Check to see if the requested name contains any blank spaces.
+            if(userChoice.equals("") || userChoice.contains(" ") || userChoice.contains("#") ||
+               userChoice.contains("}") || userChoice.contains("{") || userChoice.contains(":"))
             {
-                currentVM = (VM)vmList.get(i);
-                
-                if(userInput.equals(currentVM.getVMname()))
-                {
-                    duplicateVMname = true;
-                    i = vmList.size() + 1;
-                }
-                else
-                {
-                    duplicateVMname = false;
-                }
-            }
-            // Check to see if the requested name exists as a Hub.
-            for(int i = 0; i < hubList.size(); i++)
-            {
-                currentHub = (Hub)hubList.get(i);
-                
-                if(userInput.equals(currentHub.getHubName()))
-                {
-                    duplicateHubName = true;
-                    i = hubList.size() + 1;
-                }
-                else
-                {
-                    duplicateHubName = false;
-                }
-            }
-            if(duplicateVMname == true || duplicateHubName == true)
-            {
-                System.out.print("The device, " + userInput + " already exists as a VM or a Hub.");
-                System.out.print("\n\nPlease enter a UNIQUE name for the new VM: ");
-                userInput = input.nextLine();
-            }           
-        }
-        
-        // Add the name of the new VM object to the list.
-        editVM.setVMname(userInput);
-                
-        // Takes in the desired OS the user would like for the VM.
-        System.out.print("Please enter an OS for the VM: ");
-        userInput = input.nextLine();
-        editVM.setVMos(userInput);
-        
-        // Takes in the desired OS Version the user would like for the VM.
-        System.out.print("Please enter a version for the VM: ");
-        userInput = input.nextLine();
-        editVM.setVMversion(userInput);
-        
-        // Takes in the desired file source the user would like for the VM.
-        System.out.print("Please enter a file path for the VM: ");
-        userInput = input.nextLine();
-        editVM.setVMsource(userInput);
-        
-        // Take all changes that were applied to currentVM and copy them to newVM.
-        // Add newVM to the VM List
-        vmList.set(vmIndex, editVM);
-        
-        // Show the user the results of the entered VM.
-    ViewVM(vmList, hubList, vmIndex, hubIndex);
-    }
-    
-    public static void EditHub(List vmList, List hubList, int vmIndex, int hubIndex)
-    {
-        // Variable Declaration
-        Scanner input = new Scanner(System.in );
-        String userInput;
-        Boolean duplicateHubName = true;
-        Boolean duplicateVMname = true;
-        Hub editHub = (Hub)hubList.get(hubIndex);
-        Hub currentHub = new Hub();
-        VM currentVM = new VM();
-        
-        if(hubList.isEmpty())
-        {
-            duplicateVMname = false;
-        }
-        
-        if(vmList.isEmpty())
-        {
-            duplicateHubName = false;
-        }
-        
-        // Resets the name of the chosen Hub
-        editHub.setHubName("");
-        
-        System.out.print("\nPlease enter the name of the new Hub: ");
-        userInput = input.nextLine();
-        
-        // Checks to see if the requested name already exists in hubList.
-        // If it does, keep asking until receiving a new, unique name.
-        while(duplicateHubName == true || duplicateVMname == true)
-        {
-            // Checks to see if the requested name exists as a Hub.
-            for(int i = 0; i < hubList.size(); i++)
-            {
-                currentHub = (Hub)hubList.get(i);
-                
-                if(userInput.equals(currentHub.getHubName()))
-                {
-                    duplicateHubName = true;
-                    i = hubList.size() + 1;
-                }
-                else
-                {
-                    duplicateHubName = false;
-                }
-            }
-            // Checks to see if the requested name exists as a VM.
-            for(int i = 0; i < vmList.size(); i++)
-            {
-                currentVM = (VM)vmList.get(i);
-                
-                if(userInput.equals(currentVM.getVMname()))
-                {
-                    duplicateVMname = true;
-                    i = vmList.size() + 1;
-                }
-                else
-                {
-                    duplicateVMname = false;
-                }
-            }
-            if(duplicateVMname == true || duplicateHubName == true)
-            {
-                System.out.print("The device, " + userInput + " already exists as a VM or a Hub.");
-                System.out.print("\n\nPlease enter a UNIQUE name for the new Hub: ");
-                userInput = input.nextLine();
-            }
-        }
-        
-        // Add the name of the new VM object to the list.
-        editHub.setHubName(userInput);
-                
-        // Takes in the desired Subnet the user would like for the Hub.
-        System.out.print("Please enter a Subnet for Hub: ");
-        userInput = input.nextLine();
-        editHub.setHubSubnet(userInput);
-        
-        // Takes in the desired Netmask the user would like for the Hub.
-        System.out.print("Please enter a NetMask for Hub: ");
-        userInput = input.nextLine();
-        editHub.setHubNetmask(userInput);
-        
-        // Take all changes that were applied to currentVM and copy them to newVM.
-        // Add newVM to the VM List
-        hubList.set(hubIndex, editHub);
-        
-        // Show the user the results of the entered VM.
-        ViewHub(vmList, hubList, vmIndex, hubIndex);
-    }
-    
-    public static void DeleteDevice(List vmList, List hubList, int vmIndex, int hubIndex)
-    {
-        Scanner input = new Scanner(System.in );
-        String userInput;
-        Boolean vmExists = true;
-        Boolean hubExists = true;
-        
-
-        System.out.print("\nWhat is the EXACT name of the device you would like to delete?: ");
-        userInput = input.nextLine();
-        
-        // Checks to see if the requested device exists in vmList or hubList.
-        // If it does, run the method that corresponds to that device, which returns all values of that device.
-        if(vmList.isEmpty())
-        {
-            vmExists = false;
-        }
-        else
-        {
-            for(int i = 0; i < vmList.size(); i++)
-            {
-                VM currentVM = (VM)vmList.get(i);
-            
-                if(userInput.equals(currentVM.getVMname()))
-                {
-                    vmList.set(i, null);
-                    vmList.remove(i);
-                    System.out.print("VM, " + userInput + ", was successfully deleted from the Current VMs List!");
-                    vmExists = true;
-                    i = vmList.size() + 1;
-                }
-                else
-                {
-                    vmExists = false;
-                }
-            }
-        }
-                
-        if(hubList.isEmpty())
-        {
-            hubExists = false;
-        }
-        else
-        {
-            for(int i = 0; i < hubList.size(); i++)
-            {
-                Hub currentHub = (Hub)hubList.get(i);
-            
-                if(userInput.equals(currentHub.getHubName()))
-                {
-                    hubList.set(i, null);
-                    hubList.remove(i);
-                    System.out.print("Hub," + userInput + ", was successfully deleted from the Current Hubs List!");
-                    hubExists = true;
-                    i = hubList.size() + 1;
-                }
-                else
-                {
-                    hubExists = false;
-                }
-            }
-        }
-                
-        if(vmExists == false && hubExists == false)
-        {
-            System.out.print("\nThe device, " + userInput + ", does not exist or has not yet been entered into the program.");
-        }
-    }
-    
-    public static void ConnectDevices(List vmList, List hubList, int vmIndex, int hubIndex)
-    {
-        // Variable Declaration
-        Scanner input = new Scanner(System.in );
-        String userInput;
-        
-        Boolean vmExists = true;
-
-        System.out.print("\nWhat is the EXACT name of the VM you would like to setup for a connection?: ");
-        userInput = input.nextLine();
-        
-        // Checks to see if the requested device exists in vmList or hubList.
-        // If it does, run the method that corresponds to that device, which returns all values of that device.
-        if(vmList.isEmpty())
-        {
-            vmExists = false;
-        }
-        else if(hubList.isEmpty())
-        {
-            System.out.print("There are currently no Hubs to connect to.");
-        }
-        else
-        {
-            for(int i = 0; i < vmList.size(); i++)
-            {
-                VM currentVM = (VM)vmList.get(i);
-            
-                if(userInput.equals(currentVM.getVMname()))
-                {
-                    vmIndex = i;
-                    vmExists = true;
-                    i = vmList.size() + 1;
-                    MakeConnection(vmList, hubList, vmIndex, hubIndex);
-                }
-                else
-                {
-                    vmExists = false;
-                }
-            }
-        }
-                
-        if(vmExists == false)
-        {
-            System.out.print("The VM, '" + userInput + "', does not exist or has not yet been entered into the program.");
-        }
-    }
-    
-    public static void MakeConnection(List vmList, List hubList, int vmIndex, int hubIndex)
-    {
-        // Variable Declaration
-        Scanner input = new Scanner(System.in );
-        String userInput;
-        String hubName = "";
-        int hubsAvailable = 0;
-        Boolean hubExists = false;
-        VM editVM = (VM)vmList.get(vmIndex);
-        Hub editHub = new Hub();
-           
-        // Set all VM connections to null and delete all HubINF entries for this VM.
-        editVM.setVMconnect0(null);
-        editVM.setVMconnect1(null);
-        editVM.setVMconnect2(null);
-        editVM.setVMconnect3(null);
-        
-        for(int j = 0; j < hubList.size(); j++)
-        {
-            Hub currentHub = (Hub)hubList.get(j);
-            
-            if(currentHub.getHubINFisEmpty() == false)
-            {
-                // Does currentHub's INF contain editVM's name?
-                if(currentHub.getHubINF().contains(editVM.getVMname()))
-                {
-                    editHub = (Hub)currentHub;
-                    editHub.deleteHubINF(editVM.getVMname());
-                    hubList.set(j, editHub);
-                }
-            }
-        }
-        
-        // Run a max of four times for the 4 maximum connections a VM can have.
-        for(int i = 0; i <= 3; i++)
-        {
-            // Check to see how many Hubs are available that have not already been connected to.
-            for(int j = 0; j < hubList.size(); j++)
-            {
-                Hub currentHub = (Hub)hubList.get(j);
-                if( currentHub.getHubName().equals(editVM.getVMconnect0()) ||
-                    currentHub.getHubName().equals(editVM.getVMconnect1()) ||
-                    currentHub.getHubName().equals(editVM.getVMconnect2()) ||
-                    currentHub.getHubName().equals(editVM.getVMconnect3())    )
-                {
-                    // If this VM is already connected to a Hub in the list, skip it.
-                }
-                else
-                {
-                    hubsAvailable++;
-                }
-            }
-            
-            // Runs only if there are available hubs in the list to connect to.
-            if(hubsAvailable > 0)
-            {
-                // Print out current Hubs in the hubList.
-                System.out.print("\nCurrent Hubs: ");
-                for(int j = 0; j < hubList.size(); j++)
-                {
-                    Hub currentHub = (Hub)hubList.get(j);
-                    
-                    if( currentHub.getHubName().equals(editVM.getVMconnect0()) ||
-                        currentHub.getHubName().equals(editVM.getVMconnect1()) ||
-                        currentHub.getHubName().equals(editVM.getVMconnect2()) ||
-                        currentHub.getHubName().equals(editVM.getVMconnect3())    )
-                    {
-                    // If this VM is already connected to a Hub in the list, skip it.
-                    }
-                    else
-                    {
-                        System.out.print(currentHub.getHubName() + ", ");
-                    }
-                }
-                
-                System.out.print("\nWhat is the EXACT name of the Hub you would like to establish a connection to '" + editVM.getVMname() + "'?: ");
-                userInput = input.nextLine();
-                
-                while(hubExists == false)
-                {
-                    for(int j = 0; j < hubList.size(); j++)
-                    {
-                        Hub currentHub = (Hub)hubList.get(j);
-        
-                        if(userInput.equals(currentHub.getHubName()))
-                        {
-                            if( userInput.equals(editVM.getVMconnect0()) ||
-                                userInput.equals(editVM.getVMconnect1()) ||
-                                userInput.equals(editVM.getVMconnect2()) ||
-                                userInput.equals(editVM.getVMconnect3())    )
-                            {
-                                hubExists = false;
-                            }
-                            else
-                            {
-                               hubExists = true;
-                               hubName = userInput;
-                               j = hubList.size() + 1; 
-                            }
-                        }
-                        else
-                        {
-                            hubExists = false;
-                        }
-                    }
-                    
-                    if(hubExists == false)
-                    {
-                        System.out.print("The Hub, '" + userInput + "', does not exist or has not yet been entered into the program.");
-                        System.out.print("\n\nPlease enter the EXACT name of the Hub you would like to establish a connection to '" + editVM.getVMname() + "': ");
-                        userInput = input.nextLine();
-                    }
-                }
-                
-                // Connect the selected Hub to the current VM.
-                switch(i)
-                {
-                    case 0:
-                        editVM.setVMconnect0(userInput);
-                        
-                        System.out.print("What is the IP Address of eth0 that is connected to '" + userInput + "'?: ");
-                        userInput = input.nextLine();
-                        editVM.setVMeth0(userInput);
-                        break;
-                    case 1:
-                        editVM.setVMconnect1(userInput);
-                        
-                        System.out.print("What is the IP Address of eth1 that is connected to '" + userInput + "'?: ");
-                        userInput = input.nextLine();
-                        editVM.setVMeth1(userInput);
-                        break;
-                    case 2:
-                        editVM.setVMconnect2(userInput);
-                        
-                        System.out.print("What is the IP Address of eth2 that is connected to '" + userInput + "'?: ");
-                        userInput = input.nextLine();
-                        editVM.setVMeth2(userInput);
-                        break;
-                    case 3:
-                        editVM.setVMconnect3(userInput);
-                        
-                        System.out.print("What is the IP Address of eth3 that is connected to '" + userInput + "'?: ");
-                        userInput = input.nextLine();
-                        editVM.setVMeth3(userInput);
-                        break;
-                }
-                
-                // Writes the name of the VM and the VM's eth# port to the HubINF List.
-                for(int j = 0; j < hubList.size(); j++)
-                {
-                    Hub currentHub = (Hub)hubList.get(j);
-                    if(hubName.equals(currentHub.getHubName()))
-                    {
-                        editHub = (Hub)currentHub;
-                        editHub.setHubINF(editVM.getVMname() + ".eth" + i);
-                        hubIndex = j;
-                        j = hubList.size() + 1;
-                    }
-                }
-                hubList.set(hubIndex, editHub);
-
-                
-                if(i < 3)
-                {
-                    // Run through the connection process again for another VM or stop connecting devices?
-                    System.out.print("\nWould you like to connect another Hub to '" + editVM.getVMname() +"'?: ");
-                    userInput = input.nextLine();
-                
-                    if(userInput.equals("y") || userInput.equals("Y"))
-                    {
-                        hubsAvailable = 0;
-                        hubExists = false;
-                    }
-                    else
-                    {
-                        i = 4;
-                    }
-                }
+                containsInvalidCharacters = true;
             }
             else
             {
-                i = 4;
-                System.out.print("There are no more available Hubs to connect to.\n");
+                containsInvalidCharacters = false;
+            }
+            
+            if(vmList.isEmpty())
+            {
+                duplicateVMname = false;
+            }
+            else
+            {
+                // Check to see if the requested name exists as a VM.
+                for(int i = 0; i < vmList.size(); i++)
+                {
+                    currentVM = (VM)vmList.get(i);
+                    
+                    if(i == vmIndex)
+                    {
+                        duplicateVMname = false;
+                    }
+                    else if(userChoice.equals(currentVM.getVMname()))
+                    {
+                        duplicateVMname = true;
+                        i = vmList.size() + 1;
+                    }
+                    else
+                    {
+                        duplicateVMname = false;
+                    }
+                }
+            }
+            
+            if(hubList.isEmpty())
+            {
+                duplicateHubName = false;
+            }
+            else
+            {
+                // Check to see if the requested name exists as a Hub.
+                for(int i = 0; i < hubList.size(); i++)
+                {
+                    currentHub = (Hub)hubList.get(i);
+                
+                    if(userChoice.equals(currentHub.getHubName()))
+                    {
+                        duplicateHubName = true;
+                        i = hubList.size() + 1;
+                    }
+                    else
+                    {
+                        duplicateHubName = false;
+                    }
+                }
+            }
+            
+            if(containsInvalidCharacters == true)
+            {
+                JOptionPane.showMessageDialog(frame,
+                    "The name, " + userChoice + ", contains invalid characters or is blank. Please enter a UNIQUE name for the new VM."
+                    ,"Invalid Characters in VM Name",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if(duplicateVMname == true || duplicateHubName == true)
+            {
+                JOptionPane.showMessageDialog(frame,
+                    "The device, " + userChoice + ", already exists as a VM or a Hub. Please enter a UNIQUE name for the new VM."
+                    ,"Invalid Characters in VM Name",JOptionPane.ERROR_MESSAGE);
+                return;
             }
         }
         
+        // Add the values of the new VM object to the list.
+        editVM.setVMname(userChoice);
+        editVM.setVMos(cbOS.getSelectedIndex());
+        editVM.setVMversion(cbVer.getSelectedIndex());
+        editVM.setVMsource(tfSrc.getText());
+        
+        // Take all changes that were applied to currentVM and copy them to editVM.
+        // Add editVM to the VM List
         vmList.set(vmIndex, editVM);
-        ViewVM(vmList, hubList, vmIndex, hubIndex);
     }
     
-    public static void DeleteNetwork(List vmList, List hubList, int vmIndex, int hubIndex)
+    public static void UpdateVMNames(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
+    {
+        Hub editHub = new Hub();
+        VM currentVM = (VM)vmList.get(vmIndex);
+        String removeVMEntries = currentVM.getVMname();
+        java.util.List tempList = new ArrayList();
+        
+        for(int i = 0; i < hubList.size(); i++)
+        {
+            editHub = (Hub)hubList.get(i);
+            tempList = editHub.getHubINFlist();
+            
+            for(int j = tempList.size() - 1; j >= 0; j--)
+            {
+                if( tempList.get(i).equals(removeVMEntries + ".eth0") || 
+                    tempList.get(i).equals(removeVMEntries + ".eth1") || 
+                    tempList.get(i).equals(removeVMEntries + ".eth2") || 
+                    tempList.get(i).equals(removeVMEntries + ".eth3"))
+                {
+                    tempList.remove(i);
+                }
+            }
+            
+            editHub.replaceHubINF(tempList);
+            hubList.set(i, editHub);
+        }
+        
+    }
+    
+    public static void SaveHub(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
+    {
+        Boolean duplicateHubName = true;
+        Boolean duplicateVMname = true;
+        Boolean containsInvalidCharacters = true;
+        Hub editHub = (Hub)hubList.get(hubIndex);
+        Hub currentHub = new Hub();
+        VM currentVM = new VM();
+        String userChoice = tfName1.getText();
+        String userChoice2 = vmSwitchName.getText();
+                
+        // Checks to see if the requested name already exists in hubList.
+        // If it does, keep asking until receiving a new, unique name.
+        while(duplicateHubName == true || duplicateVMname == true || containsInvalidCharacters == true)
+        {
+            // Check to see if the requested name contains any blank spaces.
+            if(userChoice.equals("") || userChoice.contains(" ") || userChoice.contains("#") ||
+               userChoice.contains("}") || userChoice.contains("{") || userChoice.contains(":"))
+            {
+                containsInvalidCharacters = true;
+            }
+            else
+            {
+                containsInvalidCharacters = false;
+            }
+            
+            if(hubList.isEmpty())
+            {
+                duplicateHubName = false;
+            }
+            else
+            {
+                // Checks to see if the requested name exists as a Hub.
+                for(int i = 0; i < hubList.size(); i++)
+                {
+                    currentHub = (Hub)hubList.get(i);
+                                        
+                    if(i == hubIndex)
+                    {
+                        duplicateHubName = false;
+                    }
+                    else if(userChoice.equals(currentHub.getHubName()))
+                    {
+                        duplicateHubName = true;
+                        i = hubList.size() + 1;
+                    }
+                    else
+                    {
+                        duplicateHubName = false;
+                    }
+                }
+            }
+            
+            if(vmList.isEmpty())
+            {
+                duplicateVMname = false;
+            }
+            else
+            {
+                // Checks to see if the requested name exists as a VM.
+                for(int i = 0; i < vmList.size(); i++)
+                {
+                    currentVM = (VM)vmList.get(i);
+                
+                    if(userChoice.equals(currentVM.getVMname()))
+                    {
+                        duplicateVMname = true;
+                        i = vmList.size() + 1;
+                    }
+                    else
+                    {
+                        duplicateVMname = false;
+                    }
+                }
+            }
+            
+            if(containsInvalidCharacters == true)
+            {
+                JOptionPane.showMessageDialog(frame,
+                    "The name, " + userChoice + ", contains invalid characters or is blank. Please enter a UNIQUE name for the new Hub."
+                    ,"Invalid Characters in VM Name",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if(duplicateVMname == true || duplicateHubName == true)
+            {
+                JOptionPane.showMessageDialog(frame,
+                    "The device, " + userChoice + ", already exists as a VM or a Hub. Please enter a UNIQUE name for the new Hub."
+                    ,"Invalid Characters in VM Name",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        
+        duplicateHubName = true;
+        containsInvalidCharacters = true;
+        while(duplicateHubName == true || containsInvalidCharacters == true)
+        {
+            // Check to see if the requested name contains any blank spaces.
+            if(userChoice2.equals("") || userChoice2.contains(" ") || userChoice2.contains("#") ||
+               userChoice2.contains("}") || userChoice2.contains("{") || userChoice2.contains(":"))
+            {
+                containsInvalidCharacters = true;
+            }
+            else
+            {
+                containsInvalidCharacters = false;
+            }
+            
+            if(hubList.isEmpty())
+            {
+                duplicateHubName = false;
+            }
+            else
+            {
+                // Checks to see if the requested name exists as a Hub.
+                for(int i = 0; i < hubList.size(); i++)
+                {
+                    currentHub = (Hub)hubList.get(i);
+                                        
+                    if(i == hubIndex)
+                    {
+                        duplicateHubName = false;
+                    }
+                    else if(userChoice2.equals(currentHub.getHubVirtualSwitchName()))
+                    {
+                        duplicateHubName = true;
+                        i = hubList.size() + 1;
+                    }
+                    else
+                    {
+                        duplicateHubName = false;
+                    }
+                }
+            }
+            
+            if(containsInvalidCharacters == true)
+            {
+                JOptionPane.showMessageDialog(frame,
+                    "The name, " + userChoice2 + ", contains invalid characters or is blank. Please enter a UNIQUE Virtual Switch Name for the new Hub."
+                    ,"Invalid Characters in VM Name",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if(duplicateVMname == true || duplicateHubName == true)
+            {
+                JOptionPane.showMessageDialog(frame,
+                    "The name, " + userChoice2 + ", already exists as a Virtual Switch Name. Please enter a UNIQUE Virtual Switch Name for the new Hub."
+                    ,"Invalid Characters in VM Name",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        
+        // Add the values of the new Hub object to the list.
+        editHub.setHubVirtualSwitchName(userChoice2);
+        editHub.setHubName(userChoice);
+        editHub.setHubSubnet(tfSubnet.getText());
+        editHub.setHubNetmask(tfNetmask.getText());
+        
+        // Take all changes that were applied to currentVM and copy them to editVM.
+        // Add editVM to the VM List
+        hubList.set(hubIndex, editHub);
+    }
+    
+    public static void DeleteVM(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
+    {
+        VM editVM = (VM)vmList.get(vmIndex);
+        String userInput = editVM.getVMname();
+        java.util.List tempList = new ArrayList();
+        
+        // Checks to see if the requested device exists in vmList or hubList.
+        // If it does, run the method that corresponds to that device, which returns all values of that device.
+        
+        editVM.resetVM();
+        vmList.set(vmIndex, editVM);
+        vmList.set(vmIndex, null);
+        vmList.remove(vmIndex);
+                    
+        for(int i = 0; i < hubList.size(); i++)
+        {
+            Hub currentHub = (Hub)hubList.get(i);
+            tempList = currentHub.getHubINFlist();
+            for(int j = tempList.size() - 1; j >= 0; j--)
+            {
+                if(tempList.get(j).equals(userInput + ".eth0") ||
+                   tempList.get(j).equals(userInput + ".eth1") ||
+                   tempList.get(j).equals(userInput + ".eth2") ||
+                   tempList.get(j).equals(userInput + ".eth3"))
+                {
+                    tempList.remove(j);
+                }
+            }
+            currentHub.replaceHubINF(tempList);
+        }
+    }
+            
+    public static void DeleteHub(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
+    {
+        // Checks to see if the requested device exists in vmList or hubList.
+        // If it does, run the method that corresponds to that device, which returns all values of that device.
+        Hub editHub = (Hub)hubList.get(hubIndex);
+        java.util.List hubNameList = new ArrayList();
+        
+        for(int i = 0; i < hubList.size(); i++)
+        {
+            Hub currentHub = (Hub)hubList.get(i);
+            hubNameList.add(currentHub.getHubName());
+        }
+        
+        for(int i = 0; i < vmList.size(); i++)
+        {
+            VM editVM = (VM)vmList.get(i);
+            
+            for(int j = 0; j < hubNameList.size(); j++)
+            {
+                if(editVM.getVMconnect0() == j)
+                {
+                    editVM.setVMconnect0(0);
+                    editVM.setVMeth0("");
+                }
+                if(editVM.getVMconnect1() == j)
+                {
+                    editVM.setVMconnect1(0);
+                    editVM.setVMeth1("");
+                }
+                if(editVM.getVMconnect2() == j)
+                {
+                    editVM.setVMconnect2(0);
+                    editVM.setVMeth2("");
+                }
+                if(editVM.getVMconnect3() == j)
+                {
+                    editVM.setVMconnect3(0);
+                    editVM.setVMeth3("");
+                }
+                
+                vmList.set(i, editVM);
+            }
+        }
+        
+        editHub.resetHub();
+        hubList.set(hubIndex, editHub);
+        hubList.set(hubIndex, null);
+        hubList.remove(hubIndex);
+    }
+    
+    public static void DeleteNetwork(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
     {
         // Variable Declaration
-        Scanner input = new Scanner(System.in );
-        String userInput;
         VM currentVM = new VM();
         Hub currentHub = new Hub();
         
-        System.out.print("\nAre you sure you would like to delete the entire network configuration?");
-        System.out.print("\nThis will permanently delete all VMs, Hubs, and Network Configurations!: ");
-
-        userInput = input.next();
+        // Set all VM objects to NULL so they are removed from memory.
+        for(int i = 0; i < vmList.size(); i++)
+        {
+            vmList.set(i, null);
+        }    
+        vmList.clear();
+        vmIndex = -1;
+            
+        // Set all Hub objects to NULL so they are removed from memory.
+        for(int i = 0; i < hubList.size(); i++)
+        {
+            hubList.set(i, null);
+        }   
+        hubList.clear();
+        hubIndex= -1;
+    }
+    
+    public static void MakeConnection(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
+    {
+        // Variable Declaration
+        VM editVM = (VM)vmList.get(vmIndex);
+        Hub currentHub = new Hub();
+        Hub previousHub = new Hub();
+        java.util.List tempList = new ArrayList();
         
-        if(userInput.equals("y") || userInput.equals("Y"))
+        int hub0 = cbCnts0.getSelectedIndex();
+        int hub1 = cbCnts1.getSelectedIndex();
+        int hub2 = cbCnts2.getSelectedIndex();
+        int hub3 = cbCnts3.getSelectedIndex();
+        
+        if(hub0 == hub1 || hub0 == hub2 || hub0 == hub3)
         {
-            // Set all VM objects to NULL so they are removed from memory.
-            for(int i = 0; i < vmList.size(); i++)
+            if(hub0 > 0)
             {
-                vmList.set(i, null);
-            }    
-            vmList.clear();
-            vmIndex = -1;
-            
-            // Set all Hub objects to NULL so they are removed from memory.
-            for(int i = 0; i < hubList.size(); i++)
-            {
-                hubList.set(i, null);
-            }   
-            hubList.clear();
-            hubIndex= -1;
-            
-            System.out.print("\nThe Network Configuration was deleted!");
+                currentHub = (Hub)hubList.get(hub0 - 1);
+                JOptionPane.showMessageDialog(frame,
+                    currentHub.getHubName() + " is already trying to be connected to the VM. Please remove or change this connection."
+                    ,"Duplicate Connections",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
-        else
+        
+        if(hub1 == hub0 || hub1 == hub2 || hub1 == hub3)
         {
-            System.out.print("\nDeleting the Network Configuration was cancelled!");
+            if(hub1 > 0)
+            {
+                currentHub = (Hub)hubList.get(hub1 - 1);
+                JOptionPane.showMessageDialog(frame,
+                    currentHub.getHubName() + " is already trying to be connected to the VM. Please remove or change this connection."
+                    ,"Duplicate Connections",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        
+        if(hub2 == hub0 || hub2 == hub1 || hub2 == hub3)
+        {
+            if(hub2 > 0)
+            {
+                currentHub = (Hub)hubList.get(hub2 - 1);
+                JOptionPane.showMessageDialog(frame,
+                    currentHub.getHubName() + " is already trying to be connected to the VM. Please remove or change this connection."
+                    ,"Duplicate Connections",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        
+        if(hub3 == hub0 || hub3 == hub1 || hub3 == hub2)
+        {
+            if(hub3 > 0)
+            {
+                currentHub = (Hub)hubList.get(hub3 - 1);
+                JOptionPane.showMessageDialog(frame,
+                    currentHub.getHubName() + " is already trying to be connected to the VM. Please remove or change this connection."
+                    ,"Duplicate Connections",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        
+        if(hub0 > 0 && previousHub0 == 0)
+        {
+            editVM.setVMconnect0(cbCnts0.getSelectedIndex());
+            editVM.setVMeth0(tfCnts0.getText());
+            
+            currentHub = (Hub)hubList.get(hub0 - 1);
+            tempList = currentHub.getHubINFlist();
+            tempList.add(editVM.getVMname() + ".eth0");
+            currentHub.replaceHubINF(tempList);
+            hubList.set(hub0 - 1, currentHub);
+        }
+        else if(hub0 == 0 && previousHub0 > 0)
+        {
+            editVM.setVMconnect0(0);
+            editVM.setVMeth0("");
+            
+            previousHub = (Hub)hubList.get(previousHub0 - 1);
+            tempList = previousHub.getHubINFlist();
+            for(int i = tempList.size() - 1; i >= 0; i--)
+            {
+                if( tempList.get(i).equals(editVM.getVMname() + ".eth0") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth1") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth2") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth3"))
+                {
+                    tempList.remove(i);
+                }
+            }
+            previousHub.replaceHubINF(tempList);
+            hubList.set(previousHub0 - 1, previousHub);
+        }
+        else if(hub0 > 0 && previousHub0 > 0)
+        {
+            editVM.setVMconnect0(cbCnts0.getSelectedIndex());
+            editVM.setVMeth0(tfCnts0.getText());
+            
+            previousHub = (Hub)hubList.get(previousHub0 - 1);
+            tempList = previousHub.getHubINFlist();
+            for(int i = tempList.size() - 1; i >= 0; i--)
+            {
+                if( tempList.get(i).equals(editVM.getVMname() + ".eth0") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth1") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth2") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth3"))
+                {
+                    tempList.remove(i);
+                }
+            }
+            previousHub.replaceHubINF(tempList);
+            hubList.set(previousHub0 - 1, previousHub);
+            
+            currentHub = (Hub)hubList.get(hub0 - 1);
+            tempList = currentHub.getHubINFlist();
+            tempList.add(editVM.getVMname() + ".eth0");
+            currentHub.replaceHubINF(tempList);
+            hubList.set(hub0 - 1, currentHub);
+        }
+        
+        if(hub1 > 0 && previousHub1 == 0)
+        {
+            editVM.setVMconnect1(cbCnts1.getSelectedIndex());
+            editVM.setVMeth1(tfCnts1.getText());
+            
+            currentHub = (Hub)hubList.get(hub1 - 1);
+            tempList = currentHub.getHubINFlist();
+            tempList.add(editVM.getVMname() + ".eth1");
+            currentHub.replaceHubINF(tempList);
+            hubList.set(hub1 - 1, currentHub);
+        }
+        else if(hub1 == 0 && previousHub1 > 0)
+        {
+            editVM.setVMconnect1(0);
+            editVM.setVMeth1("");
+            
+            previousHub = (Hub)hubList.get(previousHub1 - 1);
+            tempList = previousHub.getHubINFlist();
+            for(int i = tempList.size() - 1; i >= 0; i--)
+            {
+                if( tempList.get(i).equals(editVM.getVMname() + ".eth0") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth1") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth2") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth3"))
+                {
+                    tempList.remove(i);
+                }
+            }
+            previousHub.replaceHubINF(tempList);
+            hubList.set(previousHub1 - 1, previousHub);
+        }
+        else if(hub1 > 0 && previousHub1 > 0)
+        {
+            editVM.setVMconnect1(cbCnts1.getSelectedIndex());
+            editVM.setVMeth1(tfCnts1.getText());
+            
+            previousHub = (Hub)hubList.get(previousHub1 - 1);
+            tempList = previousHub.getHubINFlist();
+            for(int i = tempList.size() - 1; i >= 0; i--)
+            {
+                if( tempList.get(i).equals(editVM.getVMname() + ".eth0") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth1") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth2") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth3"))
+                {
+                    tempList.remove(i);
+                }
+            }
+            previousHub.replaceHubINF(tempList);
+            hubList.set(previousHub1 - 1, previousHub);
+            
+            currentHub = (Hub)hubList.get(hub1 - 1);
+            tempList = currentHub.getHubINFlist();
+            tempList.add(editVM.getVMname() + ".eth1");
+            currentHub.replaceHubINF(tempList);
+            hubList.set(hub1 - 1, currentHub);
+        }
+        
+        if(hub2 > 0 && previousHub2 == 0)
+        {
+            editVM.setVMconnect2(cbCnts2.getSelectedIndex());
+            editVM.setVMeth2(tfCnts2.getText());
+            
+            currentHub = (Hub)hubList.get(hub2 - 1);
+            tempList = currentHub.getHubINFlist();
+            tempList.add(editVM.getVMname() + ".eth2");
+            currentHub.replaceHubINF(tempList);
+            hubList.set(hub2 - 1, currentHub);
+        }
+        else if(hub2 == 0 && previousHub2 > 0)
+        {
+            editVM.setVMconnect2(0);
+            editVM.setVMeth2("");
+            
+            previousHub = (Hub)hubList.get(previousHub2 - 1);
+            tempList = previousHub.getHubINFlist();
+            for(int i = tempList.size() - 1; i >= 0; i--)
+            {
+                if( tempList.get(i).equals(editVM.getVMname() + ".eth0") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth1") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth2") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth3"))
+                {
+                    tempList.remove(i);
+                }
+            }
+            previousHub.replaceHubINF(tempList);
+            hubList.set(previousHub2 - 1, previousHub);
+        }
+        else if(hub2 > 0 && previousHub2 > 0)
+        {
+            editVM.setVMconnect2(cbCnts2.getSelectedIndex());
+            editVM.setVMeth2(tfCnts2.getText());
+            
+            previousHub = (Hub)hubList.get(previousHub2 - 1);
+            tempList = previousHub.getHubINFlist();
+            for(int i = tempList.size() - 1; i >= 0; i--)
+            {
+                if( tempList.get(i).equals(editVM.getVMname() + ".eth0") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth1") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth2") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth3"))
+                {
+                    tempList.remove(i);
+                }
+            }
+            previousHub.replaceHubINF(tempList);
+            hubList.set(previousHub2 - 1, previousHub);
+            
+            currentHub = (Hub)hubList.get(hub2 - 1);
+            tempList = currentHub.getHubINFlist();
+            tempList.add(editVM.getVMname() + ".eth2");
+            currentHub.replaceHubINF(tempList);
+            hubList.set(hub2 - 1, currentHub);
+        }
+        
+        if(hub3 > 0 && previousHub3 == 0)
+        {
+            editVM.setVMconnect3(cbCnts3.getSelectedIndex());
+            editVM.setVMeth3(tfCnts3.getText());
+            
+            currentHub = (Hub)hubList.get(hub3 - 1);
+            tempList = currentHub.getHubINFlist();
+            tempList.add(editVM.getVMname() + ".eth3");
+            currentHub.replaceHubINF(tempList);
+            hubList.set(hub3 - 1, currentHub);
+        }
+        else if(hub3 == 0 && previousHub3 > 0)
+        {
+            editVM.setVMconnect3(0);
+            editVM.setVMeth3("");
+            
+            previousHub = (Hub)hubList.get(previousHub3 - 1);
+            tempList = previousHub.getHubINFlist();
+            for(int i = tempList.size() - 1; i >= 0; i--)
+            {
+                if( tempList.get(i).equals(editVM.getVMname() + ".eth0") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth1") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth2") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth3"))
+                {
+                    tempList.remove(i);
+                }
+            }
+            previousHub.replaceHubINF(tempList);
+            hubList.set(previousHub3 - 1, previousHub);
+        }
+        else if(hub3 > 0 && previousHub3 > 0)
+        {
+            editVM.setVMconnect3(cbCnts3.getSelectedIndex());
+            editVM.setVMeth3(tfCnts3.getText());
+            
+            previousHub = (Hub)hubList.get(previousHub3 - 1);
+            tempList = previousHub.getHubINFlist();
+            for(int i = tempList.size() - 1; i >= 0; i--)
+            {
+                if( tempList.get(i).equals(editVM.getVMname() + ".eth0") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth1") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth2") || 
+                    tempList.get(i).equals(editVM.getVMname() + ".eth3"))
+                {
+                    tempList.remove(i);
+                }
+            }
+            previousHub.replaceHubINF(tempList);
+            hubList.set(previousHub3 - 1, previousHub);
+            
+            currentHub = (Hub)hubList.get(hub3 - 1);
+            tempList = currentHub.getHubINFlist();
+            tempList.add(editVM.getVMname() + ".eth3");
+            currentHub.replaceHubINF(tempList);
+            hubList.set(hub3 - 1, currentHub);
+        }
+
+        vmList.set(vmIndex, editVM);
+    }
+    
+    public void SaveConfigFile(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList) throws IOException
+    {
+        try
+        {
+            int returnVal = fc.showOpenDialog(GroupOneGUI.this);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) 
+            {
+                File savingConfigFile = fc.getSelectedFile();
+                //This is where a real application would open the file.
+                if (!savingConfigFile.exists())
+                {
+                    savingConfigFile.createNewFile();
+                }
+
+                // Allows the user to name the output file.
+                String filePath = "ThisIsMyFilePathVariable";
+                PrintWriter outputToFile = new PrintWriter(savingConfigFile);
+
+                // Write the contents of each VM
+                for(int i = 0; i < vmList.size(); i++)
+                {
+                    VM currentVM = (VM)vmList.get(i);
+                    outputToFile.print("vm " + currentVM.getVMname() + " {\n");
+
+                    switch(currentVM.getVMos())
+                    {
+                        case 0:
+                            outputToFile.print("\tos: \n");
+                            outputToFile.print("\tver: \"\"\n");
+                            break;
+                        case 1:
+                            outputToFile.print("\tos: WINDOWS\n");
+                            switch(currentVM.getVMversion())
+                            {
+                                case 0:
+                                    outputToFile.print("\tver: \"\"\n");
+                                    break;
+                                case 1:
+                                    outputToFile.print("\tver: \"10\"\n");
+                                    break;
+                                case 2:
+                                    outputToFile.print("\tver: \"8\"\n");
+                                    break;
+                                case 3:
+                                    outputToFile.print("\tver: \"7\"\n");
+                                    break;
+                                case 4:
+                                    outputToFile.print("\tver: \"Vista\"\n");
+                                    break;
+                                case 5:
+                                    outputToFile.print("\tver: \"XP\"\n");
+                                    break;
+                            }
+                            break;
+                        case 2:
+                            outputToFile.print("\tos: LINUX\n");
+                            switch(currentVM.getVMversion())
+                            {
+                                case 0:
+                                    outputToFile.print("\tver: \"\"\n");
+                                    break;
+                                case 1:
+                                    outputToFile.print("\tver: \"Mint\"\n");
+                                    break;
+                                case 2:
+                                    outputToFile.print("\tver: \"Ubuntu\"\n");
+                                    break;
+                                case 3:
+                                    outputToFile.print("\tver: \"Debian\"\n");
+                                    break;
+                                case 4:
+                                    outputToFile.print("\tver: \"Fedora\"\n");
+                                    break;
+                                case 5:
+                                    outputToFile.print("\tver: \"CentOS\"\n");
+                                    break;
+                            }
+                            break;
+                        case 3:
+                            outputToFile.print("\tos: MAC OS X\n");
+                            switch(currentVM.getVMversion())
+                            {
+                                case 0:
+                                    outputToFile.print("\tver: \"\"\n");
+                                    break;
+                                case 1:
+                                    outputToFile.print("\tver: \"Yosemite\"\n");
+                                    break;
+                                case 2:
+                                    outputToFile.print("\tver: \"Mavericks\"\n");
+                                    break;
+                                case 3:
+                                    outputToFile.print("\tver: \"Mountain Lion\"\n");
+                                    break;
+                                case 4:
+                                    outputToFile.print("\tver: \"Lion\"\n");
+                                    break;
+                                case 5:
+                                    outputToFile.print("\tver: \"Snow Leopard\"\n");
+                                    break;
+                            }
+                            break;
+                    }
+                    outputToFile.print("\tsrc: \"" + currentVM.getVMsource() + "\"\n");
+
+                    if(currentVM.getVMconnect0() > 0)
+                    {
+                        outputToFile.print("\teth0: \"" + currentVM.getVMeth0() + "\"\n");
+                    }
+                    if(currentVM.getVMconnect1() > 0)
+                    {
+                        outputToFile.print("\teth1: \"" + currentVM.getVMeth1() + "\"\n");
+                    }
+                    if(currentVM.getVMconnect2() > 0)
+                    {
+                        outputToFile.print("\teth2: \"" + currentVM.getVMeth2() + "\"\n");
+                    }
+                    if(currentVM.getVMconnect3() > 0)
+                    {
+                        outputToFile.print("\teth3: \"" + currentVM.getVMeth3() + "\"\n");
+                    }
+
+                    outputToFile.print("}\n\n");
+                }
+
+                // Write the contents of each Hub
+                for(int i = 0; i < hubList.size(); i++)
+                {
+                    Hub currentHub = (Hub)hubList.get(i);
+                    outputToFile.print("hub " + currentHub.getHubName() + " {\n");
+                    outputToFile.print("\tinf: " + currentHub.getHubINF() + "\n");
+                    outputToFile.print("\tsubnet: \"" + currentHub.getHubSubnet() + "\"\n");
+                    outputToFile.print("\tnetmask: \"" + currentHub.getHubNetmask() + "\"\n");
+                    outputToFile.print("}\n\n");
+                }
+
+                // Write the contents of the Partial Solution
+                int i;
+                int j;
+                String physicalHostName = vmHostName.getText();
+                String virtualSwitchName = vmSwitchName.getText();
+                java.util.List tempList = new ArrayList();
+
+                outputToFile.print("partial_solution {\n");
+
+                for(i = 0; i < hubList.size() - 1; i++)
+                {
+                    Hub currentHub = (Hub)hubList.get(i);
+                    tempList = currentHub.getHubINFlist();
+
+                    for(j = 0; j < tempList.size(); j++)
+                    {
+                        outputToFile.print("\t(" + tempList.get(j) + " " + physicalHostName + "." + virtualSwitchName + "),\n");
+                    }
+                }
+
+                if(hubList.isEmpty() == false)
+                {
+                    Hub currentHub = (Hub)hubList.get(i);
+                    tempList = currentHub.getHubINFlist();
+
+                    for(j = 0; j < tempList.size() - 1; j++)
+                    {
+                        outputToFile.print("\t(" + tempList.get(j) + " " + physicalHostName + "." + virtualSwitchName + "),\n");
+                    }
+                    if(tempList.isEmpty() == false)
+                    {
+                        outputToFile.print("\t(" + tempList.get(j) + " " + physicalHostName + "." + virtualSwitchName + ")\n");
+                    }
+                }
+                outputToFile.print("}\n");
+                outputToFile.close();
+            }
+        }
+        catch (IOException er)
+        {
+            er.printStackTrace();
         }
     }
     
-    public static void SaveConfigFile(List vmList, List hubList, int vmIndex, int hubIndex) throws IOException
+    /*
+    public static void LoadConfigFile(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList) throws IOException
     {
         // Variable Declaration
         Scanner input = new Scanner(System. in);
         String userChoice;
-                        
-        // Allows the user to name the output file.
-        System.out.print("\nWhat would you like to name the new outputted config file (Don't include a file extension)?: ");
+        java.util.List loadedValuesList = new ArrayList();
+        BufferedReader lineReader = null;
+        String currentLine;
+        
+        System.out.print("\nWhat is the name of the file you would like load into the program (Include the file extension)?: ");
         userChoice = input.nextLine();
-        File savingConfigFile = new File(userChoice + ".cfg");
-        PrintWriter output = new PrintWriter(savingConfigFile);
         
-        // Write the contents of each VM
-        for(int i = 0; i < vmList.size(); i++)
+        try
         {
-            VM currentVM = (VM)vmList.get(i);
-            output.print("vm " + currentVM.getVMname() + " {\n");
-            output.print("\tos: " + currentVM.getVMos() + "\n");
-            output.print("\tver: \"" + currentVM.getVMversion() + "\"\n");
-            output.print("\tsrc: \"" + currentVM.getVMsource() + "\"\n");
+            lineReader = new BufferedReader(new FileReader(userChoice));
             
-            if(currentVM.getVMconnect0() != null)
+            while((currentLine = lineReader.readLine()) != null)
             {
-                output.print("\teth0: \"" + currentVM.getVMeth0() + "\"\n");
+                loadedValuesList.add(currentLine);
             }
-            if(currentVM.getVMconnect1() != null)
-            {
-                output.print("\teth1: \"" + currentVM.getVMeth1() + "\"\n");
-            }
-            if(currentVM.getVMconnect2() != null)
-            {
-                output.print("\teth2: \"" + currentVM.getVMeth2() + "\"\n");
-            }
-            if(currentVM.getVMconnect3() != null)
-            {
-                output.print("\teth3: \"" + currentVM.getVMeth3() + "\"\n");
-            }
-            
-            output.print("}\n\n");
         }
-        
-        // Write the contents of each Hub
-        for(int i = 0; i < hubList.size(); i++)
+        catch(IOException e)
         {
-            Hub currentHub = (Hub)hubList.get(i);
-            output.print("hub " + currentHub.getHubName() + " {\n");
-            output.print("\tinf: " + currentHub.getHubINF() + "\n");
-            output.print("\tsubnet: \"" + currentHub.getHubSubnet() + "\"\n");
-            output.print("\tnetmask: \"" + currentHub.getHubNetmask() + "\"\n");
-            output.print("}\n\n");
+            e.printStackTrace();
         }
         
-        // Write the contents of the Partial Solution
-        output.print("partial_solution {\n");
-        for(int i = 0; i < hubList.size(); i++)
+        System.out.print("\n\n");
+        
+        for(int i = 0; i < loadedValuesList.size(); i++)
         {
-            Hub currentHub = (Hub)hubList.get(i);
+            currentLine = (String)loadedValuesList.get(i);
+            if(currentLine.startsWith("vm "))
+            {
+                while(currentLine.contains("}") == false)
+                {
+                    if(currentLine.startsWith("vm "))
+                    {
+                        currentLine.replace("vm", "");
+                        currentLine.replaceAll(" ", "");
+                        currentLine.replaceAll("\t", "");
+                        currentLine.replaceAll("{", "");
+                        currentLine.replaceAll("}", "");
+                        currentLine.replaceAll(":", "");
+                        currentLine.replaceAll("\"", "");
+                        currentLine.replaceAll("#", "");
+                        System.out.print("\n" + currentLine);
+                    }
+                    else if(currentLine.contains("os:"))
+                    {
+                        currentLine.replace("os:", "");
+                        currentLine.replaceAll(" ", "");
+                        currentLine.replaceAll("\t", "");
+                        currentLine.replaceAll("{", "");
+                        currentLine.replaceAll("}", "");
+                        currentLine.replaceAll(":", "");
+                        currentLine.replaceAll("\"", "");
+                        currentLine.replaceAll("#", "");
+                        System.out.print("\n" + currentLine);
+                    }
+                    else if(currentLine.contains("ver:"))
+                    {
+                        currentLine.replace("ver:", "");
+                        currentLine.replaceAll(" ", "");
+                        currentLine.replaceAll("\t", "");
+                        currentLine.replaceAll("{", "");
+                        currentLine.replaceAll("}", "");
+                        currentLine.replaceAll(":", "");
+                        currentLine.replaceAll("\"", "");
+                        currentLine.replaceAll("#", "");
+                        System.out.print("\n" + currentLine);
+                    }
+                    else if(currentLine.contains("eth0:"))
+                    {
+                        currentLine.replace("eth0:", "");
+                        currentLine.replaceAll(" ", "");
+                        currentLine.replaceAll("\t", "");
+                        currentLine.replaceAll("{", "");
+                        currentLine.replaceAll("}", "");
+                        currentLine.replaceAll(":", "");
+                        currentLine.replaceAll("\"", "");
+                        currentLine.replaceAll("#", "");
+                        System.out.print("\n" + currentLine);
+                    }
+                    else if(currentLine.contains("eth1:"))
+                    {
+                        currentLine.replace("eth1:", "");
+                        currentLine.replaceAll(" ", "");
+                        currentLine.replaceAll("\t", "");
+                        currentLine.replaceAll("{", "");
+                        currentLine.replaceAll("}", "");
+                        currentLine.replaceAll(":", "");
+                        currentLine.replaceAll("\"", "");
+                        currentLine.replaceAll("#", "");
+                        System.out.print("\n" + currentLine);
+                    }
+                    else if(currentLine.contains("eth2:"))
+                    {
+                        currentLine.replace("eth2:", "");
+                        currentLine.replaceAll(" ", "");
+                        currentLine.replaceAll("\t", "");
+                        currentLine.replaceAll("{", "");
+                        currentLine.replaceAll("}", "");
+                        currentLine.replaceAll(":", "");
+                        currentLine.replaceAll("\"", "");
+                        currentLine.replaceAll("#", "");
+                        System.out.print("\n" + currentLine);
+                    }
+                    else if(currentLine.contains("eth3:"))
+                    {
+                        currentLine.replace("eth3:", "");
+                        currentLine.replaceAll(" ", "");
+                        currentLine.replaceAll("\t", "");
+                        currentLine.replaceAll("{", "");
+                        currentLine.replaceAll("}", "");
+                        currentLine.replaceAll(":", "");
+                        currentLine.replaceAll("\"", "");
+                        currentLine.replaceAll("#", "");
+                        System.out.print("\n" + currentLine);
+                    }
+                }
+            }
+            else if(currentLine.startsWith("hub"))
+            {
+                System.out.print("I see a prefix of hub on line " + (i + 1) + "\n");
+            }
+            else if(currentLine.startsWith("partial_solution"))
+            {
+                System.out.print("I see a prefix of partial_solution on line " + (i + 1) + "\n");
+            }
         }
-        output.print("}\n");
-        
-        output.close();
-        System.out.print("\nConfig File saved successfully!");
     }
     
+    */
     
-
+    public static void main(String[] args)
+    {
+        
+        
+        SwingUtilities.invokeLater(new Runnable(){
+            @Override
+            public void run(){
+                UIManager.put("swing.boldMetal", Boolean.FALSE);
+                    createAndShowGUI();
+            }
+        });
+    }
 }
