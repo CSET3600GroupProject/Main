@@ -39,6 +39,7 @@ public class GroupOneGUI extends JPanel implements ActionListener
     public static JLabel emp1,emp2,emp3,emp4,vsn;
     public static String[] strOS = {"", "WINDOWS", "LINUX", "OS X" };
     public static ImageIcon vMs, hubs;
+    public static StringBuilder previousVMName = new StringBuilder();
     
     // Variable Declarations
     java.util.List vmList = new ArrayList();
@@ -631,8 +632,6 @@ public class GroupOneGUI extends JPanel implements ActionListener
             null,
             options,
             options[0]);
-
-
         }
     }
     
@@ -702,12 +701,6 @@ public class GroupOneGUI extends JPanel implements ActionListener
                 
                 hubIndex = j;
             }
-        }
-        
-        for(int i = 0; i < hubList.size(); i++)
-        {
-            Hub currentHub = (Hub)hubList.get(i);
-            System.out.print("\nHub INF for " + currentHub.getHubName() + ": " + currentHub.getHubINF());
         }
     }
     
@@ -811,6 +804,7 @@ public class GroupOneGUI extends JPanel implements ActionListener
         // Add the newly created VM to the VM List.
         VM newVM = new VM();
         vmList.add(newVM);
+        vmIndex = vmList.size() - 1;
     }
     
     public static void AddNewHub(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
@@ -818,6 +812,7 @@ public class GroupOneGUI extends JPanel implements ActionListener
         // Add the newly created Hub to the Hub List.
         Hub newHub = new Hub();
         hubList.add(newHub);
+        hubIndex = hubList.size() - 1;
     }
     
     public static void SaveVM(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
@@ -830,7 +825,10 @@ public class GroupOneGUI extends JPanel implements ActionListener
         VM currentVM = new VM();
         Hub currentHub = new Hub();
         String userChoice = tfName.getText();
-                
+        
+        previousVMName.setLength(0);
+        previousVMName.append(editVM.getVMname());
+        
         // Checks to see if the requested name already exists in vmList or hubList.
         // If it does, keep asking until receiving a new, unique name.
         while(duplicateVMname == true || duplicateHubName == true || containsInvalidCharacters == true)
@@ -926,8 +924,6 @@ public class GroupOneGUI extends JPanel implements ActionListener
     public static void UpdateVMNames(java.util.List vmList, java.util.List hubList, java.util.List canvasVMList, java.util.List canvasHubList)
     {
         Hub editHub = new Hub();
-        VM currentVM = (VM)vmList.get(vmIndex);
-        String removeVMEntries = currentVM.getVMname();
         java.util.List tempList = new ArrayList();
         
         for(int i = 0; i < hubList.size(); i++)
@@ -937,12 +933,15 @@ public class GroupOneGUI extends JPanel implements ActionListener
             
             for(int j = tempList.size() - 1; j >= 0; j--)
             {
-                if( tempList.get(i).equals(removeVMEntries + ".eth0") || 
-                    tempList.get(i).equals(removeVMEntries + ".eth1") || 
-                    tempList.get(i).equals(removeVMEntries + ".eth2") || 
-                    tempList.get(i).equals(removeVMEntries + ".eth3"))
+                System.out.print("\n#############################################" + tempList.get(j) + " =matches?= " + (previousVMName + ".eth0"));
+                
+                if( tempList.get(j).equals(previousVMName + ".eth0") || 
+                    tempList.get(j).equals(previousVMName + ".eth1") || 
+                    tempList.get(j).equals(previousVMName + ".eth2") || 
+                    tempList.get(j).equals(previousVMName + ".eth3"))
                 {
-                    tempList.remove(i);
+                    System.out.print("\n***** ITEM MATCH AND NEEDS TO BE REMOVED!!! *****");
+                    tempList.remove(j);
                 }
             }
             
@@ -1231,6 +1230,12 @@ public class GroupOneGUI extends JPanel implements ActionListener
         int hub2 = cbCnts2.getSelectedIndex();
         int hub3 = cbCnts3.getSelectedIndex();
         
+        for(int i = 0; i < hubList.size(); i++)
+        {
+            currentHub = (Hub)hubList.get(i);
+            tempList = currentHub.getHubINFlist();
+        }
+        
         if(hub0 == hub1 || hub0 == hub2 || hub0 == hub3)
         {
             if(hub0 > 0)
@@ -1510,7 +1515,12 @@ public class GroupOneGUI extends JPanel implements ActionListener
             currentHub.replaceHubINF(tempList);
             hubList.set(hub3 - 1, currentHub);
         }
-
+        
+        previousHub0 = editVM.getVMconnect0();
+        previousHub1 = editVM.getVMconnect1();
+        previousHub2 = editVM.getVMconnect2();
+        previousHub3 = editVM.getVMconnect3();
+        
         vmList.set(vmIndex, editVM);
     }
     
@@ -1655,7 +1665,6 @@ public class GroupOneGUI extends JPanel implements ActionListener
                 int i;
                 int j;
                 String physicalHostName = vmHostName.getText();
-                String virtualSwitchName = vmSwitchName.getText();
                 java.util.List tempList = new ArrayList();
 
                 outputToFile.print("partial_solution {\n");
@@ -1667,7 +1676,7 @@ public class GroupOneGUI extends JPanel implements ActionListener
 
                     for(j = 0; j < tempList.size(); j++)
                     {
-                        outputToFile.print("\t(" + tempList.get(j) + " " + physicalHostName + "." + virtualSwitchName + "),\n");
+                        outputToFile.print("\t(" + tempList.get(j) + " " + physicalHostName + "." + currentHub.getHubVirtualSwitchName() + "),\n");
                     }
                 }
 
@@ -1678,11 +1687,11 @@ public class GroupOneGUI extends JPanel implements ActionListener
 
                     for(j = 0; j < tempList.size() - 1; j++)
                     {
-                        outputToFile.print("\t(" + tempList.get(j) + " " + physicalHostName + "." + virtualSwitchName + "),\n");
+                        outputToFile.print("\t(" + tempList.get(j) + " " + physicalHostName + "." + currentHub.getHubVirtualSwitchName() + "),\n");
                     }
                     if(tempList.isEmpty() == false)
                     {
-                        outputToFile.print("\t(" + tempList.get(j) + " " + physicalHostName + "." + virtualSwitchName + ")\n");
+                        outputToFile.print("\t(" + tempList.get(j) + " " + physicalHostName + "." + currentHub.getHubVirtualSwitchName() + ")\n");
                     }
                 }
                 outputToFile.print("}\n");
